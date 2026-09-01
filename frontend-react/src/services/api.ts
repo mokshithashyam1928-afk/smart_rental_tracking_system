@@ -24,7 +24,7 @@ function clearTokens() {
 }
 
 // ---------------------------------------------------------------------------
-// Core fetch wrapper with auto-refresh on 401
+// Core fetch wrapper with auto-refresh on 401 and response unwrapping
 // ---------------------------------------------------------------------------
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken()
@@ -46,10 +46,14 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
         body: JSON.stringify({ refresh }),
       })
       if (refreshRes.ok) {
-        const { access } = await refreshRes.json()
-        sessionStorage.setItem('access_token', access)
-        headers['Authorization'] = `Bearer ${access}`
-        res = await fetch(`${BASE_URL}${path}`, { ...options, headers })
+        const raw = await refreshRes.json()
+        const payload = raw?.data ?? raw
+        const access = payload.access
+        if (access) {
+          sessionStorage.setItem('access_token', access)
+          headers['Authorization'] = `Bearer ${access}`
+          res = await fetch(`${BASE_URL}${path}`, { ...options, headers })
+        }
       } else {
         clearTokens()
         window.location.href = '/login'
@@ -63,13 +67,22 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   }
 
   if (!res.ok) {
-    const detail = await res.text()
-    throw new Error(detail || `API error: ${res.status}`)
+    const errJson = await res.json().catch(() => null)
+    const message =
+      errJson?.error?.message ||
+      errJson?.detail ||
+      errJson?.message ||
+      (typeof errJson === 'string' ? errJson : `API error: ${res.status}`)
+    throw new Error(message)
   }
 
-  // Handle empty response (204 No Content)
   if (res.status === 204) return {} as T
-  return res.json() as Promise<T>
+  const json = await res.json()
+  // Automatically unwrap APIResponse { success: true, data: ... }
+  if (json && typeof json === 'object' && 'data' in json && 'success' in json) {
+    return json.data as T
+  }
+  return json as T
 }
 
 // ---------------------------------------------------------------------------
@@ -131,7 +144,7 @@ function adaptDashboardStats(summary: Record<string, unknown>): DashboardStat[] 
 }
 
 // ---------------------------------------------------------------------------
-// Public API surface (drop-in replacement for the old mock api)
+// Public API surface
 // ---------------------------------------------------------------------------
 export const api = {
   // Auth
@@ -139,22 +152,29 @@ export const api = {
     const res = await fetch(`${BASE_URL}/api/auth/login/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email: email.trim(), password }),
     })
+    const json = await res.json().catch(() => ({}))
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}))
-      throw new Error((err as { detail?: string }).detail || 'Invalid email or password')
+      const err =
+        json?.error?.message ||
+        json?.detail ||
+        json?.message ||
+        'Invalid email or password'
+      throw new Error(err)
     }
-    const data = await res.json() as {
-      access: string; refresh: string;
-      user: { id: number; email: string; first_name: string; last_name: string; role: Role }
-    }
-    setTokens(data.access, data.refresh)
+
+    const payload = json?.data ?? json
+    const user = payload.user
+    const access = payload.access
+    const refresh = payload.refresh
+
+    setTokens(access, refresh)
     return {
-      name: `${data.user.first_name} ${data.user.last_name}`.trim() || data.user.email,
-      email: data.user.email,
-      role: data.user.role,
-      token: data.access,
+      name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email,
+      email: user.email,
+      role: user.role,
+      token: access,
     }
   },
 
@@ -164,27 +184,34 @@ export const api = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email,
+        email: email.trim(),
         password,
         first_name: firstName,
         last_name: rest.join(' '),
         role,
       }),
     })
+    const json = await res.json().catch(() => ({}))
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}))
-      throw new Error(JSON.stringify(err) || 'Registration failed')
+      const err =
+        json?.error?.message ||
+        json?.detail ||
+        json?.message ||
+        'Registration failed'
+      throw new Error(err)
     }
-    const data = await res.json() as {
-      access: string; refresh: string;
-      user: { email: string; first_name: string; last_name: string; role: Role }
-    }
-    setTokens(data.access, data.refresh)
+
+    const payload = json?.data ?? json
+    const user = payload.user
+    const access = payload.access
+    const refresh = payload.refresh
+
+    setTokens(access, refresh)
     return {
       name,
-      email: data.user.email,
-      role: data.user.role,
-      token: data.access,
+      email: user.email,
+      role: user.role,
+      token: access,
     }
   },
 
@@ -207,7 +234,8 @@ export const api = {
 
   async getLiveAssets(): Promise<Asset[]> {
     const items = await request<unknown[]>('/api/dashboard/live_assets/')
-    return items.map((eq) => adaptEquipment(eq as Record<string, unknown>))
+    const array = Array.isArray(items) ? items : []
+    return array.map((eq) => adaptEquipment(eq as Record<string, unknown>))
   },
 
   // Rentals
