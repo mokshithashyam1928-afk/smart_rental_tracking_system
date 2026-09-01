@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TITAN IoT - Rental Details</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#321300",
+                        "on-secondary-fixed-variant": "#5f402c",
+                        "surface-bright": "#fff8f6",
+                        "on-surface": "#211a17",
+                        "tertiary-fixed-dim": "#91cfec",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#fdeee7",
+                        "primary": "#8a4c21",
+                        "primary-fixed-dim": "#ffb68b",
+                        "inverse-surface": "#372f2b",
+                        "outline": "#86736a",
+                        "secondary": "#795742",
+                        "on-error-container": "#93000a",
+                        "on-primary-container": "#fffbff",
+                        "on-secondary-fixed": "#2d1606",
+                        "on-background": "#211a17",
+                        "secondary-fixed": "#ffdbc8",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#ffb68b",
+                        "on-tertiary-fixed-variant": "#004d64",
+                        "surface": "#fff8f6",
+                        "surface-variant": "#eee0d9",
+                        "on-secondary-container": "#7a5843",
+                        "secondary-fixed-dim": "#eabda4",
+                        "primary-fixed": "#ffdbc8",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#ffd1b6",
+                        "background": "#fff8f6",
+                        "on-primary-fixed-variant": "#70370d",
+                        "surface-container-high": "#f4e5df",
+                        "on-tertiary-container": "#fbfdff",
+                        "outline-variant": "#d8c2b7",
+                        "surface-container-highest": "#eee0d9",
+                        "surface-container": "#faebe5",
+                        "primary-container": "#a86337",
+                        "tertiary": "#1c637d",
+                        "surface-container-low": "#fff1eb",
+                        "tertiary-container": "#3c7c96",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#53443b",
+                        "tertiary-fixed": "#bde9ff",
+                        "on-tertiary-fixed": "#001f2a",
+                        "surface-tint": "#8d4e23",
+                        "surface-dim": "#e5d7d1",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "unit": "4px",
+                        "container-max": "1440px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-caps": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "data-mono": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-lg min-h-screen flex flex-col md:flex-row">
+<!-- Mobile Top Navigation -->
+<nav class="md:hidden flex justify-between items-center px-gutter w-full sticky top-0 z-50 h-16 border-b border-outline-variant bg-surface transition-colors duration-200">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">TITAN IoT</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer hover:bg-surface-container-high rounded-full p-2 transition-colors duration-200" data-icon="notifications">notifications</span>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="A small, circular avatar portrait of an industrial site manager wearing a hard hat, photographed in a high-key, modern lighting setup with warm amber accents, reflecting a professional industrial trust aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJKcwUq20QkHYEPN98TUlqveIbuhWycS6U-8GItQTfehFxYkXa-xlf2zddRReSFD4H4Dvp_TUR-jxhwdDKHX6789Gq9IDk_VmgWqlcV0Wj2xCKASSl00sOaKmyn43Qw4XCY-IbzrPMc9XzS14UXql0iR0E7yGIHuVBLsWlhzao2PE8cTptuySMYqHSTkB9-aH07lshtzVWWH2MF8ZKvIlDxwQeYisF8hKV7qIQB14IEInzwxkdnGfD5g"/>
+</div>
+</nav>
+<!-- Desktop Side Navigation -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 py-8 bg-surface-container-lowest border-r border-outline-variant transition-all duration-150 z-40">
+<div class="px-gutter mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-DEFAULT bg-primary flex items-center justify-center text-on-primary font-bold text-xl">T</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary font-bold tracking-tight">Titan IoT</h1>
+<span class="font-label-caps text-label-caps text-on-surface-variant block uppercase">Industrial Fleet</span>
+</div>
+</div>
+</div>
+<ul class="flex flex-col gap-1 px-4 flex-grow">
+<li><a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-caps text-label-caps uppercase" href="dashboard.html"><span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>Dashboard</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-caps text-label-caps uppercase" href="equipment.html"><span class="material-symbols-outlined" data-icon="precision_manufacturing">precision_manufacturing</span>Equipment</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-caps text-label-caps uppercase" href="Map.html"><span class="material-symbols-outlined" data-icon="location_on">location_on</span>Sites</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-caps text-label-caps uppercase" href="dashboard.html"><span class="material-symbols-outlined" data-icon="badge">badge</span>Operators</a></li>
+<!-- Active State Navigation mapped to Rentals as this is a Rental Details page -->
+<li><a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT border-l-4 border-primary bg-surface-container-high text-primary font-bold transition-colors font-label-caps text-label-caps uppercase -ml-4 pl-7" href="dashboard.html"><span class="material-symbols-outlined" data-icon="contract" style="font-variation-settings: 'FILL' 1;">contract</span>Rentals</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-caps text-label-caps uppercase" href="dashboard.html"><span class="material-symbols-outlined" data-icon="analytics">analytics</span>Analytics</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-caps text-label-caps uppercase" href="dashboard.html"><span class="material-symbols-outlined" data-icon="notifications">notifications</span>Notifications</a></li>
+</ul>
+<div class="mt-auto px-4">
+<ul class="flex flex-col gap-1 border-t border-outline-variant pt-4">
+<li><a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-caps text-label-caps uppercase" href="dashboard.html"><span class="material-symbols-outlined" data-icon="settings">settings</span>Settings</a></li>
+<li><a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors font-label-caps text-label-caps uppercase" href="dashboard.html"><span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>Support</a></li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 p-margin-mobile md:p-margin-desktop w-full max-w-container-max mx-auto flex flex-col gap-8">
+<!-- Top Section: Status Header & Actions -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-outline-variant">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="font-label-caps text-label-caps bg-secondary text-on-secondary px-3 py-1 rounded-sm uppercase tracking-widest inline-flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                        ACTIVE
+                    </span>
+<span class="font-data-mono text-data-mono text-on-surface-variant">RNTL-8842-X</span>
+</div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface font-bold">Cat 320 Excavator</h1>
+</div>
+<div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+<button class="flex-1 md:flex-none px-6 py-2 border border-outline text-on-surface font-label-caps text-label-caps uppercase rounded-DEFAULT hover:bg-surface-container transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span> Edit
+                </button>
+<button class="flex-1 md:flex-none px-6 py-2 border border-outline text-on-surface font-label-caps text-label-caps uppercase rounded-DEFAULT hover:bg-surface-container transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="stop_circle">stop_circle</span> Terminate
+                </button>
+<button class="w-full md:w-auto px-6 py-2 bg-primary text-on-primary font-label-caps text-label-caps uppercase font-bold rounded-DEFAULT hover:bg-primary-container transition-colors flex justify-center items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="fact_check">fact_check</span> Check-In
+                </button>
+</div>
+</header>
+<!-- Middle Section: 2 Columns -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: Equipment Info -->
+<section class="lg:col-span-7 flex flex-col gap-6">
+<!-- Equipment Visual & Primary Specs Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT overflow-hidden flex flex-col sm:flex-row shadow-sm group hover:border-outline transition-colors relative">
+<!-- Subtle decorative accent line for active status -->
+<div class="absolute top-0 left-0 w-full sm:w-1 h-1 sm:h-full bg-secondary"></div>
+<div class="w-full sm:w-2/5 h-48 sm:h-auto relative bg-surface-container">
+<img alt="Cat 320 Excavator" class="absolute inset-0 w-full h-full object-cover" data-alt="A wide shot of a modern, heavy-duty yellow construction excavator parked on a clean, industrial gravel site under stark, bright midday lighting, reflecting a precise, reliable amber earth industrial aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9kTS7H4Xf6rD5oLBcQbHMRK-rL6vGARCO6UD_Fww5uVfokhOEoEtbUSkmxpi6Z2WA1qrnNzkMhysx2A_5oC0WRNth6gcFwBcbOeQPkEtbPZUaWJr2xeEGQoe-lEkyDjxwbOBriEUT7SxHJVdKmpQ_YUdC-MmNLN4we7WrJsJiNuGkiZQIQSQQWkbrOV1IBy8kMID1FKC47mJYfQ8yt20p9keux-Y4dApxXO8EJlZiRPIS0TmVlKq2zA"/>
+</div>
+<div class="p-6 flex-1 flex flex-col justify-between pl-6 sm:pl-8">
+<div>
+<h2 class="font-headline-md text-headline-md font-bold mb-1">Equipment Details</h2>
+<p class="font-data-mono text-data-mono text-on-surface-variant mb-4">ID: EQ-320-994</p>
+<div class="grid grid-cols-2 gap-y-4 gap-x-2">
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Make / Model</span>
+<span class="block font-body-sm text-body-sm font-semibold">Caterpillar 320</span>
+</div>
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Class</span>
+<span class="block font-body-sm text-body-sm font-semibold">Heavy Excavation</span>
+</div>
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Year</span>
+<span class="block font-body-sm text-body-sm font-semibold">2023</span>
+</div>
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Weight</span>
+<span class="block font-body-sm text-body-sm font-semibold">22,500 kg</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Live Telemetry Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT p-6 shadow-sm">
+<div class="flex items-center gap-2 mb-6 border-b border-surface-variant pb-4">
+<span class="material-symbols-outlined text-tertiary" data-icon="sensors">sensors</span>
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface">Live Telemetry</h2>
+<span class="ml-auto font-data-mono text-[10px] text-tertiary bg-tertiary-fixed-dim px-2 py-1 rounded-sm uppercase tracking-wider">Connected</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface p-4 border border-outline-variant rounded-sm flex flex-col items-center justify-center text-center relative overflow-hidden group">
+<div class="absolute inset-0 bg-tertiary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-symbols-outlined text-outline mb-2" data-icon="local_gas_station">local_gas_station</span>
+<span class="font-display-lg text-display-lg font-bold text-on-surface">65<span class="text-headline-md">%</span></span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Fuel Level</span>
+<!-- Simple fuel bar -->
+<div class="w-full h-1 bg-surface-variant mt-3 rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-[65%]"></div>
+</div>
+</div>
+<div class="bg-surface p-4 border border-outline-variant rounded-sm flex flex-col items-center justify-center text-center relative overflow-hidden group">
+<div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-symbols-outlined text-outline mb-2" data-icon="speed">speed</span>
+<span class="font-display-lg text-display-lg font-bold text-on-surface">0<span class="text-headline-md text-on-surface-variant ml-1">km/h</span></span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Current Speed</span>
+<!-- Engine status indicator -->
+<div class="w-full flex justify-center items-center gap-2 mt-3">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-data-mono text-[10px] text-secondary uppercase">Idling</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Column: Rental Terms -->
+<section class="lg:col-span-5 flex flex-col gap-6">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT flex flex-col shadow-sm h-full">
+<div class="p-6 bg-surface-container-low border-b border-outline-variant">
+<h2 class="font-headline-md text-headline-md font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="description">description</span>
+                            Rental Terms
+                        </h2>
+</div>
+<div class="p-6 flex-1 flex flex-col gap-6">
+<!-- Entity Info -->
+<div class="flex flex-col gap-4 border-b border-surface-variant pb-6">
+<div class="flex items-start gap-4">
+<div class="w-10 h-10 bg-surface-variant rounded-full flex items-center justify-center border border-outline shrink-0">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="person">person</span>
+</div>
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Operator</span>
+<span class="block font-body-lg text-body-lg font-semibold text-on-surface">Jameson Contracting LLC</span>
+<span class="block font-data-mono text-data-mono text-on-surface-variant mt-1">OP-ID: 44921</span>
+</div>
+</div>
+<div class="flex items-start gap-4 mt-2">
+<div class="w-10 h-10 bg-surface-variant rounded-full flex items-center justify-center border border-outline shrink-0">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="domain">domain</span>
+</div>
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Site Location</span>
+<span class="block font-body-lg text-body-lg font-semibold text-on-surface">Sector 4 - Alpha Build</span>
+<span class="block font-data-mono text-data-mono text-on-surface-variant mt-1">Zone B, Industrial Park</span>
+</div>
+</div>
+</div>
+<!-- Schedule & Finances -->
+<div class="grid grid-cols-2 gap-y-6 gap-x-4">
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="calendar_today">calendar_today</span> Start Date
+                                </span>
+<span class="block font-data-mono text-body-lg font-semibold text-on-surface">Oct 12, 2023</span>
+<span class="block font-data-mono text-[11px] text-on-surface-variant">08:00 AM EST</span>
+</div>
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="event_return">event_repeat</span> Expected Return
+                                </span>
+<span class="block font-data-mono text-body-lg font-semibold text-on-surface">Nov 24, 2023</span>
+<span class="block font-data-mono text-[11px] text-on-surface-variant">17:00 PM EST</span>
+</div>
+<div class="col-span-2 bg-surface p-4 border border-outline-variant rounded-sm mt-2 flex justify-between items-center">
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Deposit Secured</span>
+<span class="block font-data-mono text-body-lg font-bold text-on-surface">$5,000.00</span>
+</div>
+<span class="material-symbols-outlined text-secondary" data-icon="verified_user" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Bottom Section: Recent Telemetry & Activity Log -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-gutter mt-2 border-t border-outline-variant pt-8">
+<!-- Sparkline Chart Box -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT p-6 shadow-sm flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">Usage Trend (7 Days)</h3>
+<select class="font-data-mono text-data-mono bg-surface border-outline-variant rounded-sm focus:ring-primary focus:border-primary text-sm py-1">
+<option>Operating Hours</option>
+<option>Fuel Consumption</option>
+</select>
+</div>
+<!-- Abstract visual representation of a sparkline/chart -->
+<div class="flex-1 min-h-[200px] flex items-end justify-between gap-1 relative pt-10 border-b border-l border-outline-variant pb-2 pl-2">
+<!-- Y-axis labels -->
+<div class="absolute left-[-24px] top-0 bottom-0 flex flex-col justify-between py-2 text-[10px] font-data-mono text-outline">
+<span>12h</span>
+<span>6h</span>
+<span>0h</span>
+</div>
+<!-- Bars -->
+<div class="w-full bg-primary/20 hover:bg-primary/40 transition-colors h-[40%] rounded-t-sm group relative cursor-crosshair">
+<div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-inverse-surface text-inverse-on-surface font-data-mono text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">4.2 hrs</div>
+</div>
+<div class="w-full bg-primary/40 hover:bg-primary/60 transition-colors h-[65%] rounded-t-sm group relative cursor-crosshair">
+<div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-inverse-surface text-inverse-on-surface font-data-mono text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">7.1 hrs</div>
+</div>
+<div class="w-full bg-primary hover:bg-primary-container transition-colors h-[85%] rounded-t-sm group relative cursor-crosshair">
+<div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-inverse-surface text-inverse-on-surface font-data-mono text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">9.5 hrs</div>
+</div>
+<div class="w-full bg-primary/80 hover:bg-primary transition-colors h-[75%] rounded-t-sm group relative cursor-crosshair">
+<div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-inverse-surface text-inverse-on-surface font-data-mono text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">8.2 hrs</div>
+</div>
+<div class="w-full bg-primary/60 hover:bg-primary/80 transition-colors h-[50%] rounded-t-sm group relative cursor-crosshair">
+<div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-inverse-surface text-inverse-on-surface font-data-mono text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">5.5 hrs</div>
+</div>
+<div class="w-full bg-outline-variant hover:bg-outline transition-colors h-[10%] rounded-t-sm group relative cursor-crosshair">
+<div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-inverse-surface text-inverse-on-surface font-data-mono text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">1.1 hrs</div>
+</div>
+<div class="w-full bg-secondary hover:bg-secondary-container transition-colors h-[30%] rounded-t-sm group relative cursor-crosshair border border-secondary border-b-0">
+<div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-inverse-surface text-inverse-on-surface font-data-mono text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">3.2 hrs (Today)</div>
+</div>
+</div>
+<!-- X-axis labels -->
+<div class="flex justify-between mt-2 text-[10px] font-data-mono text-outline px-2">
+<span>Oct 18</span>
+<span>Oct 24 (Today)</span>
+</div>
+</div>
+<!-- Activity Log -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT p-6 shadow-sm overflow-hidden flex flex-col h-full max-h-[350px]">
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface mb-6 sticky top-0 bg-surface-container-lowest z-10 pb-2 border-b border-surface-variant">Activity Log</h3>
+<div class="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-0">
+<!-- Log Item 1 -->
+<div class="flex gap-4 relative pb-6 group">
+<!-- Vertical line -->
+<div class="absolute left-[11px] top-6 bottom-0 w-[1px] bg-outline-variant group-last:bg-transparent"></div>
+<div class="relative z-10 w-6 h-6 rounded-full bg-surface-variant border border-outline flex items-center justify-center shrink-0 mt-1">
+<div class="w-2 h-2 bg-secondary rounded-full"></div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<span class="font-body-sm text-body-sm font-bold text-on-surface">System Diagnostic Complete</span>
+<span class="font-data-mono text-[11px] text-outline whitespace-nowrap">10:42 AM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Automated daily check passed. No anomalies detected.</p>
+</div>
+</div>
+<!-- Log Item 2 -->
+<div class="flex gap-4 relative pb-6 group">
+<div class="absolute left-[11px] top-6 bottom-0 w-[1px] bg-outline-variant group-last:bg-transparent"></div>
+<div class="relative z-10 w-6 h-6 rounded-full bg-surface-variant border border-outline flex items-center justify-center shrink-0 mt-1">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant" data-icon="local_gas_station">local_gas_station</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<span class="font-body-sm text-body-sm font-bold text-on-surface">Refueling Event Detected</span>
+<span class="font-data-mono text-[11px] text-outline whitespace-nowrap">08:15 AM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Fuel level increased from 20% to 65%.</p>
+</div>
+</div>
+<!-- Log Item 3 (Check-out) -->
+<div class="flex gap-4 relative pb-6 group">
+<div class="absolute left-[11px] top-6 bottom-0 w-[1px] bg-outline-variant group-last:bg-transparent"></div>
+<div class="relative z-10 w-6 h-6 rounded-full bg-primary/20 border border-primary flex items-center justify-center shrink-0 mt-1">
+<span class="material-symbols-outlined text-[14px] text-primary" data-icon="login">login</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<span class="font-body-sm text-body-sm font-bold text-on-surface">Equipment Checked Out</span>
+<span class="font-data-mono text-[11px] text-outline whitespace-nowrap">Oct 12, 08:05 AM</span>
+</div>
+<div class="bg-surface p-3 rounded-sm border border-outline-variant mt-2 inline-block">
+<p class="font-data-mono text-[12px] text-on-surface-variant italic">"Visual inspection clear. Engine sounds normal on startup. Tracks look good." - Operator Notes</p>
+</div>
+</div>
+</div>
+<!-- Log Item 4 -->
+<div class="flex gap-4 relative group">
+<div class="absolute left-[11px] top-6 bottom-0 w-[1px] bg-outline-variant group-last:bg-transparent"></div>
+<div class="relative z-10 w-6 h-6 rounded-full bg-surface-variant border border-outline flex items-center justify-center shrink-0 mt-1">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant" data-icon="contract">contract</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<span class="font-body-sm text-body-sm font-bold text-on-surface">Contract Initiated</span>
+<span class="font-data-mono text-[11px] text-outline whitespace-nowrap">Oct 11, 14:30 PM</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Rental agreement RNTL-8842-X generated and signed by Jameson Contracting LLC.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<style>
+        /* Custom minimal scrollbar for the log */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: var(--tw-colors-outline-variant);
+            border-radius: 4px;
+        }
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+            background-color: var(--tw-colors-outline);
+        }
+    </style>
+</body></html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartRental - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Jetbrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"slate-industrial": "#334155", "outline-variant": "#d8c2b7", secondary: "#795742", "on-primary-container": "#ffac79", "inverse-primary": "#ffb68b", "on-error-container": "#93000a", "tertiary-fixed": "#bde9ff", "on-error": "#ffffff", "turmeric-accent": "#EAB308", "on-surface": "#211a16", "secondary-fixed": "#ffdbc8", surface: "#fff8f5", "primary-fixed": "#ffdbc8", "surface-tint": "#8d4e23", "primary-container": "#793e14", "secondary-fixed-dim": "#eabda4", "on-secondary-fixed-variant": "#5f402d", "on-secondary-fixed": "#2d1506", "on-secondary": "#ffffff", "on-tertiary-container": "#8ac8e5", error: "#ba1a1a", "surface-container-high": "#f4e5df", "on-primary": "#ffffff", background: "#fff8f5", "on-background": "#211a16", "error-container": "#ffdad6", "tertiary-container": "#00556e", "surface-container-highest": "#eee0d9", "on-tertiary-fixed-variant": "#004d64", "primary-fixed-dim": "#ffb68b", "caution-amber": "#B45309", "surface-container-low": "#fff1ea", "surface-dim": "#e5d7d1", "on-tertiary": "#ffffff", "on-tertiary-fixed": "#001f2a", "dark-sea-green": "#1D3E3E", tertiary: "#003d4f", "surface-variant": "#eee0d9", "on-primary-fixed": "#321300", "on-secondary-container": "#7a5743", "on-surface-variant": "#53443b", primary: "#5c2800", "inverse-on-surface": "#fceee7", "surface-container-lowest": "#ffffff", "secondary-container": "#ffd0b7", "inverse-surface": "#372f2b", "on-primary-fixed-variant": "#70370d", "tertiary-fixed-dim": "#91cfec", "surface-bright": "#fff8f5", outline: "#86736a", "surface-container": "#f9ebe5"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {gutter: "24px", unit: "4px", "container-max": "1440px", "margin-mobile": "16px", "margin-desktop": "64px"}, fontFamily: {"label-caps": ["JetBrains Mono"], "headline-lg": ["Inter"], "body-sm": ["Inter"], "data-mono": ["JetBrains Mono"], "body-lg": ["Inter"], "display-lg": ["Inter"], "headline-lg-mobile": ["Inter"], "headline-md": ["Inter"], headline: ["Inter"], display: ["Inter"], body: ["Inter"], label: ["Jetbrains Mono"]}, fontSize: {"label-caps": ["12px", {lineHeight: "16px", letterSpacing: "0.1em", fontWeight: "700"}], "headline-lg": ["32px", {lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "700"}], "body-sm": ["14px", {lineHeight: "20px", fontWeight: "400"}], "data-mono": ["13px", {lineHeight: "16px", fontWeight: "500"}], "body-lg": ["16px", {lineHeight: "24px", fontWeight: "400"}], "display-lg": ["48px", {lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "800"}], "headline-lg-mobile": ["24px", {lineHeight: "32px", fontWeight: "700"}], "headline-md": ["20px", {lineHeight: "28px", fontWeight: "600"}]}}}};</script>
+</head>
+<body class="bg-surface-container-low min-h-screen flex items-center justify-center p-margin-mobile md:p-margin-desktop text-on-surface">
+<div class="w-full max-w-md bg-surface-container-lowest border border-outline-variant p-gutter">
+<!-- Header -->
+<div class="text-center mb-8 border-b border-outline-variant pb-6">
+<h1 class="font-display-lg text-display-lg text-primary">SmartRental</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2">SYSTEM ACCESS</p>
+</div>
+<!-- Form -->
+<form class="space-y-6" onsubmit="event.preventDefault(); window.location.href='dashboard.html';">
+<div class="space-y-1">
+<label class="block font-label-caps text-label-caps text-primary" for="username">USERNAME</label>
+<input class="w-full h-12 px-4 border border-primary bg-surface-container-lowest focus:outline-none focus:border-2 focus:border-primary focus:bg-surface-container-low transition-colors font-body-lg text-body-lg text-primary placeholder-outline" id="username" name="username" placeholder="Enter operator ID" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="block font-label-caps text-label-caps text-primary" for="password">PASSWORD</label>
+<input class="w-full h-12 px-4 border border-primary bg-surface-container-lowest focus:outline-none focus:border-2 focus:border-primary focus:bg-surface-container-low transition-colors font-body-lg text-body-lg text-primary placeholder-outline" id="password" name="password" placeholder="Enter secure key" type="password"/>
+</div>
+<div class="pt-4">
+<button class="w-full h-12 bg-primary text-on-primary font-headline-md text-headline-md hover:opacity-90 transition-opacity" type="submit">
+                Sign In
+            </button>
+</div>
+<div class="text-center mt-4 space-y-2">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors underline block" href="signup.html">Create an account</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors underline block" href="#">Forgot Credentials?</a>
+</div>
+<div class="text-center mt-8 pt-6 border-t border-outline-variant space-y-2">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-2 block" href="dashboard.html">
+<span class="material-symbols-outlined text-body-sm" style="font-size: 18px;">settings</span>Settings
+</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-2 block" href="dashboard.html">
+<span class="material-symbols-outlined text-body-sm" style="font-size: 18px;">support_agent</span>Support
+</a>
+</div>
+</form>
+</div>
+</body></html>

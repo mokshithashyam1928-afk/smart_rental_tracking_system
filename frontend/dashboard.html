@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rentals - Titan IoT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#321300",
+                        "on-secondary-fixed-variant": "#5f402c",
+                        "surface-bright": "#fff8f6",
+                        "on-surface": "#211a17",
+                        "tertiary-fixed-dim": "#91cfec",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#fdeee7",
+                        "primary": "#8a4c21",
+                        "primary-fixed-dim": "#ffb68b",
+                        "inverse-surface": "#372f2b",
+                        "outline": "#86736a",
+                        "secondary": "#795742",
+                        "on-error-container": "#93000a",
+                        "on-primary-container": "#fffbff",
+                        "on-secondary-fixed": "#2d1606",
+                        "on-background": "#211a17",
+                        "secondary-fixed": "#ffdbc8",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#ffb68b",
+                        "on-tertiary-fixed-variant": "#004d64",
+                        "surface": "#fff8f6",
+                        "surface-variant": "#eee0d9",
+                        "on-secondary-container": "#7a5843",
+                        "secondary-fixed-dim": "#eabda4",
+                        "primary-fixed": "#ffdbc8",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#ffd1b6",
+                        "background": "#fff8f6",
+                        "on-primary-fixed-variant": "#70370d",
+                        "surface-container-high": "#f4e5df",
+                        "on-tertiary-container": "#fbfdff",
+                        "outline-variant": "#d8c2b7",
+                        "surface-container-highest": "#eee0d9",
+                        "surface-container": "#faebe5",
+                        "primary-container": "#a86337",
+                        "tertiary": "#1c637d",
+                        "surface-container-low": "#fff1eb",
+                        "tertiary-container": "#3c7c96",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#53443b",
+                        "tertiary-fixed": "#bde9ff",
+                        "on-tertiary-fixed": "#001f2a",
+                        "surface-tint": "#8d4e23",
+                        "surface-dim": "#e5d7d1",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "unit": "4px",
+                        "container-max": "1440px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-caps": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "data-mono": ["13px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #fff8f6; } /* surface */
+        .double-outline-active { box-shadow: inset 0 0 0 1px #8a4c21, 0 0 0 2px transparent, 0 0 0 4px #8a4c21; }
+    </style>
+</head>
+<body class="font-body-lg text-body-lg text-on-surface flex bg-background min-h-screen">
+<!-- SideNavBar (Hidden on Mobile, Flex on MD) -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 py-8 bg-surface-container-lowest border-r border-outline-variant z-40">
+<div class="px-gutter mb-8 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary text-on-primary rounded-DEFAULT flex items-center justify-center">
+<span class="material-symbols-outlined font-bold">precision_manufacturing</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md text-primary">Titan IoT</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">Industrial Fleet</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-4">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container transition-all duration-150 scale-98 hover:text-on-surface" href="dashboard.html">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-sm text-body-sm font-semibold">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container transition-all duration-150 scale-98 hover:text-on-surface" href="equipment.html">
+<span class="material-symbols-outlined" data-icon="precision_manufacturing">precision_manufacturing</span>
+<span class="font-body-sm text-body-sm font-semibold">Equipment</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container transition-all duration-150 scale-98 hover:text-on-surface" href="Map.html">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+<span class="font-body-sm text-body-sm font-semibold">Sites</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container transition-all duration-150 scale-98 hover:text-on-surface" href="dashboard.html">
+<span class="material-symbols-outlined" data-icon="badge">badge</span>
+<span class="font-body-sm text-body-sm font-semibold">Operators</span>
+</a>
+</li>
+<!-- ACTIVE NAV ITEM -->
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT border-r-2 border-primary text-primary font-bold bg-surface-container-high transition-all duration-150 scale-98" href="dashboard.html">
+<span class="material-symbols-outlined" data-icon="contract">contract</span>
+<span class="font-body-sm text-body-sm font-semibold">Rentals</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container transition-all duration-150 scale-98 hover:text-on-surface" href="dashboard.html">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-body-sm text-body-sm font-semibold">Analytics</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container transition-all duration-150 scale-98 hover:text-on-surface" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-body-sm text-body-sm font-semibold">Notifications</span>
+</a>
+</li>
+</ul>
+</div>
+<div class="px-4 mt-auto border-t border-outline-variant pt-4">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container transition-all duration-150 scale-98 hover:text-on-surface" href="dashboard.html">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-sm text-body-sm font-semibold">Settings</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container transition-all duration-150 scale-98 hover:text-on-surface" href="dashboard.html">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+<span class="font-body-sm text-body-sm font-semibold">Support</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 md:ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-gutter w-full sticky top-0 z-50 bg-surface border-b border-outline-variant h-16 transition-colors duration-200">
+<div class="flex items-center gap-4">
+<!-- Mobile Menu Toggle (Visible only on mobile) -->
+<button class="md:hidden text-on-surface-variant">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="font-headline-md text-headline-md font-bold text-primary md:hidden">TITAN IoT</div>
+<!-- Search Bar -->
+<div class="hidden md:flex items-center bg-surface-container px-3 py-2 rounded-DEFAULT border border-outline-variant focus-within:border-primary focus-within:border-2 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 p-0 text-body-sm font-body-sm placeholder-on-surface-variant w-64" placeholder="Search Rentals..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden lg:flex items-center gap-2 bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full">
+<div class="w-2 h-2 rounded-full bg-on-tertiary-container animate-pulse"></div>
+<span class="font-data-mono text-data-mono">System Online</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container border border-outline overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="Close up portrait of an industrial site manager in a hard hat, warm cinematic lighting, highly detailed, realistic, industrial IoT context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2U7hGhP5snxQ6xWw8u4zXIK6GAsBxTo8hVKIlB9nGE1-iNyg_fZoONtpROos6f8T15a1jJvWlCWQXXSgqheZWFFatc5vhH8rbWTiQxu6GeOInE7bgXAeyN8NPLnT-NJ9yEW1V0r5w_Zd6F5H0qEsP6ZfS9g9G5q4bCa9296XwVwrv2tCl4aj8AggMznvob7JPXC6xyILJhdKN-kFXrtPIlPqDQyTzQif69mLDeIbsWa4oIzGvDhOuzg"/>
+</div>
+</div>
+</header>
+<!-- Canvas / Main Content -->
+<main class="flex-1 p-margin-mobile md:p-gutter lg:p-margin-desktop max-w-container-max mx-auto w-full">
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+<div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">Rental Contracts</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Manage and track active equipment deployments.</p>
+</div>
+<div class="flex gap-3">
+<button class="bg-surface border border-outline text-on-surface font-body-sm text-body-sm px-4 py-2 rounded-DEFAULT hover:bg-surface-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filter
+                    </button>
+<button class="bg-primary text-on-primary font-body-sm text-body-sm font-semibold px-5 py-2 rounded-DEFAULT hover:bg-surface-tint transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        New Rental
+                    </button>
+</div>
+</div>
+<!-- Stats/Bento Grid Preview (Optional context) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-DEFAULT flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant">ACTIVE RENTALS</span>
+<span class="material-symbols-outlined text-secondary">contract</span>
+</div>
+<div class="font-display-lg text-display-lg text-on-surface">42</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-DEFAULT flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant">OVERDUE</span>
+<span class="material-symbols-outlined text-error">warning</span>
+</div>
+<div class="font-display-lg text-display-lg text-error">3</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-DEFAULT flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant">UPCOMING RETURNS</span>
+<span class="material-symbols-outlined text-tertiary">event</span>
+</div>
+<div class="font-display-lg text-display-lg text-on-surface">12</div>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT overflow-hidden">
+<!-- Table Controls -->
+<div class="p-4 border-b border-outline-variant bg-surface-container flex justify-between items-center bg-tertiary/5">
+<div class="flex items-center gap-2 bg-surface border border-outline-variant rounded-DEFAULT px-3 py-1.5 focus-within:border-primary">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 p-0 text-body-sm font-body-sm placeholder-on-surface-variant w-48 lg:w-64" placeholder="Search ID or Equipment..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="p-1.5 text-on-surface-variant hover:bg-surface-container-highest rounded-DEFAULT border border-transparent hover:border-outline-variant transition-all">
+<span class="material-symbols-outlined">view_column</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:bg-surface-container-highest rounded-DEFAULT border border-transparent hover:border-outline-variant transition-all">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+<!-- The Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container border-b border-outline-variant">
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant font-semibold cursor-pointer hover:text-on-surface transition-colors">
+<div class="flex items-center gap-1">Rental ID <span class="material-symbols-outlined text-[16px]">arrow_drop_down</span></div>
+</th>
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant font-semibold">Equipment</th>
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant font-semibold">Operator</th>
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant font-semibold">Start Date</th>
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant font-semibold cursor-pointer hover:text-on-surface transition-colors">
+<div class="flex items-center gap-1">Due Date <span class="material-symbols-outlined text-[16px]">swap_vert</span></div>
+</th>
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant font-semibold">Status</th>
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1: Active -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="p-4 font-data-mono text-data-mono text-on-surface font-semibold">R001</td>
+<td class="p-4">
+<div class="font-body-sm text-body-sm text-on-surface font-semibold">Excavator CX-200</div>
+<div class="font-label-caps text-[10px] text-on-surface-variant mt-0.5">EQ-992-A</div>
+</td>
+<td class="p-4 font-body-sm text-body-sm text-on-surface">OP101 (J. Smith)</td>
+<td class="p-4 font-data-mono text-data-mono text-on-surface-variant">2023-10-15</td>
+<td class="p-4 font-data-mono text-data-mono text-on-surface">2023-11-15</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded bg-secondary text-on-secondary font-label-caps text-[10px] uppercase tracking-wider">Active</span>
+</td>
+<td class="p-4 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: Overdue -->
+<tr class="hover:bg-surface-container-low transition-colors bg-error-container/10 group">
+<td class="p-4 font-data-mono text-data-mono text-on-surface font-semibold">R002</td>
+<td class="p-4">
+<div class="font-body-sm text-body-sm text-on-surface font-semibold">Bulldozer D8T</div>
+<div class="font-label-caps text-[10px] text-on-surface-variant mt-0.5">EQ-412-B</div>
+</td>
+<td class="p-4 font-body-sm text-body-sm text-on-surface">OP204 (M. Davis)</td>
+<td class="p-4 font-data-mono text-data-mono text-on-surface-variant">2023-09-01</td>
+<td class="p-4 font-data-mono text-data-mono text-error font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">warning</span> 2023-10-01
+                                </td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded bg-primary text-on-primary font-label-caps text-[10px] uppercase tracking-wider">Overdue</span>
+</td>
+<td class="p-4 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Completed -->
+<tr class="hover:bg-surface-container-low transition-colors opacity-75 group">
+<td class="p-4 font-data-mono text-data-mono text-on-surface-variant">R003</td>
+<td class="p-4">
+<div class="font-body-sm text-body-sm text-on-surface-variant">Crane LTM 11200</div>
+<div class="font-label-caps text-[10px] text-outline mt-0.5">EQ-005-C</div>
+</td>
+<td class="p-4 font-body-sm text-body-sm text-on-surface-variant">OP088 (T. Lee)</td>
+<td class="p-4 font-data-mono text-data-mono text-outline">2023-08-10</td>
+<td class="p-4 font-data-mono text-data-mono text-outline">2023-08-24</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded bg-surface-dim text-on-surface-variant border border-outline-variant font-label-caps text-[10px] uppercase tracking-wider">Completed</span>
+</td>
+<td class="p-4 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Active -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="p-4 font-data-mono text-data-mono text-on-surface font-semibold">R004</td>
+<td class="p-4">
+<div class="font-body-sm text-body-sm text-on-surface font-semibold">Generator 500kW</div>
+<div class="font-label-caps text-[10px] text-on-surface-variant mt-0.5">EQ-771-G</div>
+</td>
+<td class="p-4 font-body-sm text-body-sm text-on-surface">OP101 (J. Smith)</td>
+<td class="p-4 font-data-mono text-data-mono text-on-surface-variant">2023-10-20</td>
+<td class="p-4 font-data-mono text-data-mono text-on-surface">2024-01-20</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded bg-secondary text-on-secondary font-label-caps text-[10px] uppercase tracking-wider">Active</span>
+</td>
+<td class="p-4 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-4 border-t border-outline-variant bg-surface-container-lowest flex justify-between items-center">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Showing 1 to 4 of 42 entries</span>
+<div class="flex gap-1">
+<button class="px-3 py-1 border border-outline-variant rounded-DEFAULT text-on-surface-variant hover:bg-surface-container disabled:opacity-50" disabled="">Prev</button>
+<button class="px-3 py-1 border border-primary bg-primary text-on-primary rounded-DEFAULT">1</button>
+<button class="px-3 py-1 border border-outline-variant rounded-DEFAULT text-on-surface hover:bg-surface-container">2</button>
+<button class="px-3 py-1 border border-outline-variant rounded-DEFAULT text-on-surface hover:bg-surface-container">3</button>
+<button class="px-3 py-1 border border-outline-variant rounded-DEFAULT text-on-surface hover:bg-surface-container">Next</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
