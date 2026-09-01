@@ -18,7 +18,6 @@ def api_client():
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def admin_user(db):
     """Create and return admin user."""
     return User.objects.create_superuser(
@@ -31,7 +30,6 @@ def admin_user(db):
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def manager_user(db):
     """Create and return manager user."""
     return User.objects.create_user(
@@ -44,7 +42,6 @@ def manager_user(db):
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def operator_user(db):
     """Create and return operator user."""
     return User.objects.create_user(
@@ -57,7 +54,6 @@ def operator_user(db):
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def site(db):
     """Create and return a test site."""
     return Site.objects.create(
@@ -71,7 +67,6 @@ def site(db):
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def operator(db):
     """Create and return a test operator."""
     return Operator.objects.create(
@@ -84,7 +79,6 @@ def operator(db):
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def equipment(db, site):
     """Create and return test equipment."""
     return Equipment.objects.create(

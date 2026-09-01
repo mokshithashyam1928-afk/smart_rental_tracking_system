@@ -2,6 +2,7 @@
 Custom pagination for Smart Rental Tracking System backend.
 """
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -11,7 +12,7 @@ class StandardResultsSetPagination(PageNumberPagination):
     max_page_size = 100
     
     def get_paginated_response(self, data):
-        return {
+        return Response({
             'success': True,
             'data': data,
             'pagination': {
@@ -22,7 +23,7 @@ class StandardResultsSetPagination(PageNumberPagination):
                 'page_size': self.page_size,
                 'total_pages': self.page.paginator.num_pages,
             }
-        }
+        })
 
 
 class LargeResultsSetPagination(PageNumberPagination):

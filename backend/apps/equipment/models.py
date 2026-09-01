@@ -27,8 +27,18 @@ class Equipment(models.Model):
         (STATUS_OFFLINE, 'Offline'),
     ]
     
+    EQUIPMENT_TYPE_CHOICES = [
+        ('EXCAVATOR', 'Excavator'),
+        ('BULLDOZER', 'Bulldozer'),
+        ('WHEEL_LOADER', 'Wheel Loader'),
+        ('DUMP_TRUCK', 'Dump Truck'),
+        ('CRANE', 'Crane'),
+        ('COMPACTOR', 'Compactor'),
+        ('GENERATOR', 'Generator'),
+    ]
+    
     equipment_id = models.CharField(max_length=50, unique=True)
-    equipment_type = models.CharField(max_length=100)
+    equipment_type = models.CharField(max_length=100, choices=EQUIPMENT_TYPE_CHOICES, default='EXCAVATOR')
     manufacturer = models.CharField(max_length=100, blank=True)
     model = models.CharField(max_length=100, blank=True)
     serial_number = models.CharField(max_length=100, blank=True, unique=True, null=True)

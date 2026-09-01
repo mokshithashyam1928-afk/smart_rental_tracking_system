@@ -150,6 +150,32 @@ class TelemetryService:
             live_state.operator = operator
             live_state.save()
         
+        # Broadcast real-time update over WebSocket channel layers
+        try:
+            from asgiref.sync import async_to_sync
+            from channels.layers import get_channel_layer
+            channel_layer = get_channel_layer()
+            if channel_layer:
+                payload = {
+                    'type': 'equipment.update',
+                    'data': {
+                        'equipment_id': equipment.equipment_id,
+                        'status': equipment.status,
+                        'last_seen': telemetry.timestamp.isoformat() if telemetry.timestamp else None,
+                        'latitude': telemetry.latitude,
+                        'longitude': telemetry.longitude,
+                        'engine_hours': telemetry.engine_hours,
+                        'idle_hours': telemetry.idle_hours,
+                        'fuel_level': telemetry.fuel_level,
+                        'speed': telemetry.speed,
+                        'operator_id': operator.employee_id if operator else None,
+                    }
+                }
+                async_to_sync(channel_layer.group_send)('equipment_all', payload)
+                async_to_sync(channel_layer.group_send)(f'equipment_{equipment.equipment_id}', payload)
+        except Exception:
+            pass
+
         return telemetry
     
     @staticmethod
