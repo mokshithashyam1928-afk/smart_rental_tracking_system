@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartRental - Site</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Jetbrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"slate-industrial": "#334155", "outline-variant": "#d8c2b7", secondary: "#795742", "on-primary-container": "#ffac79", "inverse-primary": "#ffb68b", "on-error-container": "#93000a", "tertiary-fixed": "#bde9ff", "on-error": "#ffffff", "turmeric-accent": "#EAB308", "on-surface": "#211a16", "secondary-fixed": "#ffdbc8", surface: "#fff8f5", "primary-fixed": "#ffdbc8", "surface-tint": "#8d4e23", "primary-container": "#793e14", "secondary-fixed-dim": "#eabda4", "on-secondary-fixed-variant": "#5f402d", "on-secondary-fixed": "#2d1506", "on-secondary": "#ffffff", "on-tertiary-container": "#8ac8e5", error: "#ba1a1a", "surface-container-high": "#f4e5df", "on-primary": "#ffffff", background: "#fff8f5", "on-background": "#211a16", "error-container": "#ffdad6", "tertiary-container": "#00556e", "surface-container-highest": "#eee0d9", "on-tertiary-fixed-variant": "#004d64", "primary-fixed-dim": "#ffb68b", "caution-amber": "#B45309", "surface-container-low": "#fff1ea", "surface-dim": "#e5d7d1", "on-tertiary": "#ffffff", "on-tertiary-fixed": "#001f2a", "dark-sea-green": "#1D3E3E", tertiary: "#003d4f", "surface-variant": "#eee0d9", "on-primary-fixed": "#321300", "on-secondary-container": "#7a5743", "on-surface-variant": "#53443b", primary: "#5c2800", "inverse-on-surface": "#fceee7", "surface-container-lowest": "#ffffff", "secondary-container": "#ffd0b7", "inverse-surface": "#372f2b", "on-primary-fixed-variant": "#70370d", "tertiary-fixed-dim": "#91cfec", "surface-bright": "#fff8f5", outline: "#86736a", "surface-container": "#f9ebe5"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {gutter: "24px", unit: "4px", "container-max": "1440px", "margin-mobile": "16px", "margin-desktop": "64px"}, fontFamily: {"label-caps": ["JetBrains Mono"], "headline-lg": ["Inter"], "body-sm": ["Inter"], "data-mono": ["JetBrains Mono"], "body-lg": ["Inter"], "display-lg": ["Inter"], "headline-lg-mobile": ["Inter"], "headline-md": ["Inter"], headline: ["Inter"], display: ["Inter"], body: ["Inter"], label: ["Jetbrains Mono"]}, fontSize: {"label-caps": ["12px", {lineHeight: "16px", letterSpacing: "0.1em", fontWeight: "700"}], "headline-lg": ["32px", {lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "700"}], "body-sm": ["14px", {lineHeight: "20px", fontWeight: "400"}], "data-mono": ["13px", {lineHeight: "16px", fontWeight: "500"}], "body-lg": ["16px", {lineHeight: "24px", fontWeight: "400"}], "display-lg": ["48px", {lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "800"}], "headline-lg-mobile": ["24px", {lineHeight: "32px", fontWeight: "700"}], "headline-md": ["20px", {lineHeight: "28px", fontWeight: "600"}]}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Zebra Striping specific for industrial minimal tables/lists */
+        .zebra-list > div:nth-child(even) {
+            background-color: #f2f4f6; /* surface-container-low */
+        }
+</style>
+</head>
+<body class="bg-surface text-on-surface font-body-lg text-body-lg h-screen overflow-hidden flex selection:bg-primary selection:text-on-primary">
+<!-- SideNavBar (from JSON) -->
+<nav class="h-screen w-64 border-r border-slate-industrial bg-surface flex flex-col fixed left-0 top-0 overflow-y-auto z-50 py-6">
+<!-- Header -->
+<div class="px-4 border-b border-slate-industrial pb-6 mb-2 flex items-center gap-4">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded-full text-on-primary">
+<span class="material-symbols-outlined icon-fill">precision_manufacturing</span>
+</div>
+<div>
+<h1 class="text-headline-md font-headline-md font-bold text-primary">SmartRental</h1>
+<p class="font-label-caps text-label-caps text-slate-industrial mt-1">Industrial IoT Ops</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 flex flex-col gap-1 w-full">
+<a class="flex items-center gap-3 px-4 py-3 w-full text-slate-industrial font-medium hover:bg-surface-container-high transition-all duration-200" href="dashboard.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-sm text-body-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 w-full text-slate-industrial font-medium hover:bg-surface-container-high transition-all duration-200" href="equipment.html">
+<span class="material-symbols-outlined">precision_manufacturing</span>
+<span class="font-body-sm text-body-sm">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 w-full text-slate-industrial font-medium hover:bg-surface-container-high transition-all duration-200" href="Map.html">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="font-body-sm text-body-sm">Logistics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 w-full text-slate-industrial font-medium hover:bg-surface-container-high transition-all duration-200" href="dashboard.html">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-sm text-body-sm">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 w-full text-slate-industrial font-medium hover:bg-surface-container-high transition-all duration-200" href="dashboard.html">
+<span class="material-symbols-outlined">description</span>
+<span class="font-body-sm text-body-sm">Reports</span>
+</a>
+</div>
+<!-- Footer Tabs -->
+<div class="w-full flex flex-col gap-1 border-t border-slate-industrial pt-4 mt-auto">
+<a class="flex items-center gap-3 px-4 py-3 w-full text-slate-industrial font-medium hover:bg-surface-container-high transition-all duration-200" href="dashboard.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-sm text-body-sm">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 w-full text-slate-industrial font-medium hover:bg-surface-container-high transition-all duration-200" href="dashboard.html">
+<span class="material-symbols-outlined">support_agent</span>
+<span class="font-body-sm text-body-sm">Support</span>
+</a>
+</div>
+<!-- CTA -->
+<div class="px-4 mt-4 w-full">
+<button class="w-full bg-primary text-on-primary font-label-caps text-label-caps py-4 uppercase tracking-widest hover:bg-primary-container transition-colors active:scale-95 duration-150 border border-transparent">
+                Request Support
+            </button>
+</div>
+</nav>
+<!-- Main Content Area (Full Screen Map) -->
+<main class="ml-64 relative w-[calc(100%-16rem)] h-full bg-surface-variant overflow-hidden">
+<!-- Map Background Layer -->
+<div class="absolute inset-0 bg-cover bg-center" data-alt="An industrial digital map interface showing a topographic and street view of a construction zone in monochrome grayscale with high contrast. The aesthetic is highly technical, resembling a CAD rendering or blueprint with sharp grid lines and stark lighting." data-location="Chicago" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBn6kSsXAi0xKVK2ABSAD9VxY4gAu925TTsuD9DrMAaClnC1MDC3rdgxid4ZY9ydFwPcZuhRR7jyDGnQCLFE2g8C8E5J7yoN1WC32-sfhq5wxtAi1DgYZe5UDSGROWyykw3ldBx4RNORUMv1zY1Za9Ffpdm1smdf1Uz5hN_o798w93x9_NKJ8KB__rpGD3iRaKie53TPbwmJvRbyw78lQHFDCmTIAll3Hsev8gkZhlEOW0sYnLc8WHv3g')"></div>
+<!-- Floating Search Bar -->
+<div class="absolute top-gutter left-gutter w-96 bg-surface-container-lowest border border-slate-industrial z-20 shadow-none flex items-center group focus-within:border-primary">
+<span class="material-symbols-outlined px-3 text-on-surface">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 font-body-sm text-body-sm py-3 px-0 placeholder:text-on-surface-variant text-on-surface h-full outline-none" placeholder="Search equipment, sites, or operators..." type="text"/>
+<button class="px-3 border-l border-slate-industrial hover:bg-surface-container-low h-full flex items-center transition-colors">
+<span class="material-symbols-outlined text-on-surface">filter_list</span>
+</button>
+</div>
+<!-- Map Markers & Popups Container -->
+<div class="absolute inset-0 z-10 pointer-events-none">
+<!-- Marker 1: Inactive -->
+<div class="absolute top-1/4 left-1/3 -translate-x-1/2 -translate-y-full pointer-events-auto cursor-pointer flex flex-col items-center hover:scale-110 transition-transform">
+<div class="bg-surface-container-lowest border border-slate-industrial px-2 py-1 font-label-caps text-label-caps mb-1 tracking-widest text-on-surface">CR-402</div>
+<span class="material-symbols-outlined icon-fill text-slate-industrial" style="font-size: 36px;">location_on</span>
+</div>
+<!-- Marker 2: Active with Popup (EQ1001) -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full pointer-events-auto cursor-pointer flex flex-col items-center">
+<div class="bg-primary text-on-primary border border-primary px-2 py-1 font-label-caps text-label-caps mb-1 tracking-widest">EQ1001</div>
+<span class="material-symbols-outlined icon-fill text-primary" style="font-size: 36px;">location_on</span>
+<!-- Popup Card -->
+<div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-72 bg-surface-container-lowest border border-slate-industrial p-4 flex flex-col gap-4 before:content-[''] before:absolute before:-top-[5px] before:left-1/2 before:-translate-x-1/2 before:w-2 before:h-2 before:bg-surface-container-lowest before:border-l before:border-t before:border-slate-industrial before:rotate-45 shadow-none">
+<div class="flex justify-between items-start border-b border-slate-industrial pb-3">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface m-0">EQ1001</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 uppercase tracking-wider">Excavator</p>
+</div>
+<div class="bg-primary text-on-primary px-2 py-1 font-label-caps text-label-caps flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-turmeric-accent animate-pulse"></span>
+                            IN_USE
+                        </div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-1 border-r border-slate-industrial">
+<span class="font-label-caps text-label-caps text-on-surface-variant">FUEL</span>
+<span class="font-headline-md text-headline-md text-on-surface">72%</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant">SPEED</span>
+<span class="font-headline-md text-headline-md text-on-surface">10.4 <span class="font-body-sm text-body-sm text-on-surface-variant">km/h</span></span>
+</div>
+</div>
+<div class="pt-3 border-t border-slate-industrial flex items-center justify-between">
+<div class="flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant">OPERATOR</span>
+<span class="font-body-sm text-body-sm text-on-surface font-semibold">OP101</span>
+</div>
+<button class="border border-primary text-primary px-3 py-1 font-label-caps text-label-caps hover:bg-surface-container-low transition-colors">
+                            DETAILS
+                        </button>
+</div>
+</div>
+</div>
+<!-- Marker 3: Pending -->
+<div class="absolute bottom-1/4 right-1/3 -translate-x-1/2 -translate-y-full pointer-events-auto cursor-pointer flex flex-col items-center hover:scale-110 transition-transform">
+<div class="bg-surface-container-lowest border border-caution-amber px-2 py-1 font-label-caps text-label-caps mb-1 tracking-widest text-caution-amber">TR-990</div>
+<span class="material-symbols-outlined text-caution-amber" style="font-size: 36px;">location_on</span>
+</div>
+</div>
+<!-- Floating Active Assets Sidebar Overlay -->
+<aside class="absolute top-gutter right-gutter bottom-gutter w-96 bg-surface-container-lowest border border-slate-industrial z-20 flex flex-col shadow-none">
+<!-- Overlay Header -->
+<div class="p-gutter border-b border-slate-industrial flex items-center justify-between bg-surface-container-lowest">
+<div>
+<h2 class="font-headline-md text-headline-md m-0 flex items-center gap-2">
+<span class="material-symbols-outlined icon-fill text-[16px] text-turmeric-accent animate-pulse">radio_button_checked</span>
+                        Active Assets
+                    </h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Real-time telemetry stream</p>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant border border-slate-industrial px-2 py-1">24 ONLINE</span>
+</div>
+<!-- List Area -->
+<div class="flex-1 overflow-y-auto zebra-list">
+<!-- Stream Item 1 -->
+<div class="p-4 border-b border-slate-industrial hover:border-primary transition-colors cursor-pointer group flex flex-col gap-2 relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-primary transition-colors"></div>
+<div class="flex justify-between items-start pl-2">
+<div>
+<span class="font-label-caps text-label-caps text-on-surface font-bold tracking-widest block">EQ1001</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Excavator • OP101</span>
+</div>
+<div class="bg-primary text-on-primary px-2 py-0.5 font-label-caps text-label-caps uppercase text-[10px]">IN_USE</div>
+</div>
+<div class="flex items-center gap-4 pl-2 font-body-sm text-body-sm text-on-surface">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-on-surface-variant">speed</span> 10.4 km/h</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-on-surface-variant">local_gas_station</span> 72%</span>
+</div>
+</div>
+<!-- Stream Item 2 -->
+<div class="p-4 border-b border-slate-industrial hover:border-primary transition-colors cursor-pointer group flex flex-col gap-2 relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-primary transition-colors"></div>
+<div class="flex justify-between items-start pl-2">
+<div>
+<span class="font-label-caps text-label-caps text-on-surface font-bold tracking-widest block">LD-305</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Loader • OP042</span>
+</div>
+<div class="bg-primary text-on-primary px-2 py-0.5 font-label-caps text-label-caps uppercase text-[10px]">IN_USE</div>
+</div>
+<div class="flex items-center gap-4 pl-2 font-body-sm text-body-sm text-on-surface">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-on-surface-variant">speed</span> 2.1 km/h</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-on-surface-variant">local_gas_station</span> 45%</span>
+</div>
+</div>
+<!-- Stream Item 3 -->
+<div class="p-4 border-b border-slate-industrial hover:border-primary transition-colors cursor-pointer group flex flex-col gap-2 relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-primary transition-colors"></div>
+<div class="flex justify-between items-start pl-2">
+<div>
+<span class="font-label-caps text-label-caps text-on-surface font-bold tracking-widest block">CR-402</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Crane • IDLE</span>
+</div>
+<div class="bg-surface-container-lowest border border-slate-industrial text-on-surface px-2 py-0.5 font-label-caps text-label-caps uppercase text-[10px]">IDLE</div>
+</div>
+<div class="flex items-center gap-4 pl-2 font-body-sm text-body-sm text-on-surface">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-on-surface-variant">speed</span> 0.0 km/h</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-on-surface-variant">local_gas_station</span> 89%</span>
+</div>
+</div>
+<!-- Stream Item 4 -->
+<div class="p-4 border-b border-slate-industrial hover:border-primary transition-colors cursor-pointer group flex flex-col gap-2 relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-primary transition-colors"></div>
+<div class="flex justify-between items-start pl-2">
+<div>
+<span class="font-label-caps text-label-caps text-on-surface font-bold tracking-widest block block">TR-990</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Transport • OP211</span>
+</div>
+<div class="bg-surface-container-lowest border border-caution-amber text-caution-amber px-2 py-0.5 font-label-caps text-label-caps uppercase text-[10px]">TRANSIT</div>
+</div>
+<div class="flex items-center gap-4 pl-2 font-body-sm text-body-sm text-on-surface">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-on-surface-variant">speed</span> 65.2 km/h</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-on-surface-variant">local_gas_station</span> 31%</span>
+</div>
+</div>
+</div>
+<!-- Overlay Footer -->
+<div class="p-4 border-t border-slate-industrial bg-surface-container-low flex justify-center">
+<button class="font-label-caps text-label-caps text-primary underline hover:text-surface-tint transition-colors">
+                    VIEW FULL LOG
+                </button>
+</div>
+</aside>
+</main>
+</body></html>
