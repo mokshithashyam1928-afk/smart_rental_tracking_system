@@ -13,28 +13,27 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
-async function loginService(email: string, password: string) {
-  const { api } = await import('../services/api')
-  return api.login(email, password)
-}
-
-async function signupService(name: string, email: string, password: string, role: Role) {
-  const { api } = await import('../services/api')
-  return api.signup(name, email, password, role)
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
 
+  // Restore user session on page load
   useEffect(() => {
     const saved = localStorage.getItem(AUTH_KEY)
     if (saved) {
-      setUser(JSON.parse(saved) as User)
+      try {
+        setUser(JSON.parse(saved) as User)
+      } catch {
+        localStorage.removeItem(AUTH_KEY)
+      }
     }
   }, [])
 
   const saveUser = (nextUser: User) => {
     localStorage.setItem(AUTH_KEY, JSON.stringify(nextUser))
+    // Also keep the access token in sessionStorage for api.ts to pick up
+    if (nextUser.token) {
+      sessionStorage.setItem('access_token', nextUser.token)
+    }
     setUser(nextUser)
   }
 
@@ -42,20 +41,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user,
       login: async (email: string, password: string) => {
-        const nextUser = await loginService(email, password)
+        const { api } = await import('../services/api')
+        const nextUser = await api.login(email, password)
         saveUser(nextUser)
         return nextUser
       },
       signup: async (name: string, email: string, password: string, role: Role) => {
-        const nextUser = await signupService(name, email, password, role)
+        const { api } = await import('../services/api')
+        const nextUser = await api.signup(name, email, password, role)
         saveUser(nextUser)
         return nextUser
       },
       logout: () => {
+        import('../services/api').then(({ api }) => api.logout())
         localStorage.removeItem(AUTH_KEY)
         setUser(null)
       },
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [user],
   )
 
@@ -64,10 +67,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext)
-
   if (!context) {
     throw new Error('useAuth must be used within AuthProvider')
   }
-
   return context
 }

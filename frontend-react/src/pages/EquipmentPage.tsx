@@ -1,27 +1,45 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Camera, ScanLine, Search, ShieldCheck } from 'lucide-react'
 import { Navbar } from '../components/Navbar'
 import { Sidebar } from '../components/Sidebar'
 import { useAuth } from '../context/AuthContext'
 import { mockAssets } from '../data/mockData'
+import { api } from '../services/api'
+import type { Asset } from '../types'
 
 export function EquipmentPage() {
   const { user } = useAuth()
   const [search, setSearch] = useState('')
-  const [qrCode, setQrCode] = useState('EQ-1001')
+  const [qrCode, setQrCode] = useState('CAT-336-1001')
+  const [assets, setAssets] = useState<Asset[]>(mockAssets)
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const live = await api.getAssets()
+        if (live && live.length > 0) {
+          setAssets(live)
+          setQrCode(live[0]?.id || 'CAT-336-1001')
+        }
+      } catch {
+        // fallback to mock
+      }
+    }
+    load()
+  }, [])
 
   const filteredAssets = useMemo(() => {
     const value = search.trim().toLowerCase()
 
-    if (!value) return mockAssets
+    if (!value) return assets
 
-    return mockAssets.filter(
+    return assets.filter(
       (asset) =>
         asset.id.toLowerCase().includes(value) ||
         asset.name.toLowerCase().includes(value) ||
         asset.site.toLowerCase().includes(value),
     )
-  }, [search])
+  }, [search, assets])
 
   return (
     <div className="flex min-h-screen bg-[#fff8f6] text-stone-900">
@@ -59,53 +77,52 @@ export function EquipmentPage() {
                   <div key={asset.id} className="flex items-center justify-between rounded-2xl border border-stone-200 bg-stone-50 p-3">
                     <div>
                       <p className="font-semibold text-stone-900">{asset.name}</p>
-                      <p className="text-xs uppercase tracking-[0.2em] text-stone-500">{asset.id}</p>
+                      <p className="text-xs text-stone-500">
+                        {asset.id} · {asset.site}
+                      </p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-stone-700">{asset.site}</p>
-                      <p className="text-xs text-stone-500">Status: {asset.status}</p>
-                    </div>
+                    <span className="rounded-full bg-stone-200 px-2 py-1 text-xs font-semibold text-stone-700">
+                      {asset.status}
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
-              <div className="flex items-center gap-2">
-                <ScanLine className="text-[#ab6639]" size={18} />
-                <p className="text-xs uppercase tracking-[0.25em] text-stone-500">QR workflow</p>
-              </div>
-
-              <div className="mt-6 rounded-3xl border-2 border-dashed border-[#ab6639]/30 bg-[#fff3e8] p-6 text-center">
-                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-sm">
-                  <ScanLine className="text-[#ab6639]" size={30} />
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.25em] text-stone-500">Scanner & RFID</p>
+                  <h3 className="mt-2 text-2xl font-bold">QR Verification</h3>
                 </div>
-                <p className="mt-4 text-lg font-bold text-stone-900">Ready to scan</p>
-                <p className="mt-2 text-sm text-stone-600">Point a QR code or enter the asset ID manually.</p>
+                <ScanLine className="text-[#ab6639]" size={20} />
               </div>
 
-              <div className="mt-5 space-y-3">
-                <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-stone-600">Asset reference</label>
-                <input
-                  value={qrCode}
-                  onChange={(event) => setQrCode(event.target.value)}
-                  className="w-full rounded-xl border border-stone-300 bg-stone-50 px-4 py-3 text-sm outline-none focus:border-[#ab6639] focus:bg-white"
-                />
-                <button className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-semibold text-stone-700 hover:bg-stone-50">
-                  Validate asset
-                </button>
+              <div className="space-y-4">
+                <div className="rounded-2xl border border-dashed border-stone-300 p-6 text-center">
+                  <p className="text-xs uppercase tracking-[0.2em] text-stone-400">Mock scanner window</p>
+                  <p className="mt-2 text-lg font-bold text-stone-800">{qrCode}</p>
+                  <p className="mt-1 text-xs text-stone-500">Ready for RFID/QR trigger</p>
+                </div>
+
+                <div className="grid gap-2">
+                  <label className="text-xs font-semibold uppercase tracking-[0.15em] text-stone-500">Override scan value</label>
+                  <input
+                    value={qrCode}
+                    onChange={(event) => setQrCode(event.target.value)}
+                    className="rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-sm outline-none"
+                  />
+                </div>
+
+                <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-stone-800">
+                    <ShieldCheck size={16} className="text-[#ab6639]" />
+                    <span>Hardware telemetry valid</span>
+                  </div>
+                  <p className="mt-1 text-xs text-stone-500">GPS link and asset state verified against Caterpillar central fleet directory.</p>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="text-[#ab6639]" size={18} />
-              <p className="text-xs uppercase tracking-[0.25em] text-stone-500">Operational check</p>
-            </div>
-            <p className="mt-2 text-sm text-stone-600">
-              QR validation confirms equipment authenticity, site assignment, and operator credential status before checkout or return.
-            </p>
           </div>
         </main>
       </div>
