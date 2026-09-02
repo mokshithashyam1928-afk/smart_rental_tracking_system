@@ -1,14 +1,14 @@
-import { Activity, BarChart3, MapPinned, ShieldCheck, Truck, UserCircle2 } from 'lucide-react'
+import { Activity, BarChart3, MapPinned, QrCode, ShieldCheck, Truck, UserCircle2 } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import type { Role } from '../types'
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: BarChart3, roles: ['ADMIN', 'MANAGER', 'OPERATOR', 'VIEWER'] },
+  { to: '/checkin-checkout', label: 'Check In / Out', icon: QrCode, roles: ['ADMIN', 'MANAGER', 'OPERATOR'] },
   { to: '/equipment', label: 'Equipment', icon: Truck, roles: ['ADMIN', 'MANAGER', 'OPERATOR', 'VIEWER'] },
   { to: '/inventory', label: 'Inventory', icon: Truck, roles: ['ADMIN', 'MANAGER', 'OPERATOR', 'VIEWER'] },
   { to: '/sites', label: 'Sites', icon: MapPinned, roles: ['ADMIN', 'MANAGER', 'OPERATOR', 'VIEWER'] },
   { to: '/operators', label: 'Operators', icon: UserCircle2, roles: ['ADMIN', 'MANAGER', 'OPERATOR'] },
-  { to: '/map', label: 'Live Map', icon: MapPinned, roles: ['ADMIN', 'MANAGER', 'OPERATOR', 'VIEWER'] },
   { to: '/rentals', label: 'Rentals', icon: Activity, roles: ['ADMIN', 'MANAGER', 'OPERATOR'] },
   { to: '/analytics', label: 'Analytics', icon: ShieldCheck, roles: ['ADMIN', 'MANAGER'] },
 ]

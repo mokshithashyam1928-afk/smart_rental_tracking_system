@@ -38,6 +38,8 @@ class SiteBreakdownSerializer(serializers.Serializer):
     site_name = serializers.CharField()
     total_equipment = serializers.IntegerField()
     active_equipment = serializers.IntegerField()
+    total_rented_hours = serializers.FloatField(required=False, default=0.0)
+    total_fuel_liters = serializers.FloatField(required=False, default=0.0)
     utilization_rate = serializers.FloatField()
     active_rentals = serializers.IntegerField()
 

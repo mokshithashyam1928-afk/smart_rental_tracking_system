@@ -33,6 +33,17 @@ class EquipmentCreateUpdateSerializer(serializers.ModelSerializer):
             'serial_number', 'qr_code', 'rfid_uid', 'site', 'status',
             'current_operator', 'purchase_date'
         ]
+        extra_kwargs = {
+            'manufacturer': {'required': False, 'allow_blank': True},
+            'model': {'required': False, 'allow_blank': True},
+            'serial_number': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'qr_code': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'rfid_uid': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'site': {'required': False, 'allow_null': True},
+            'status': {'required': False},
+            'current_operator': {'required': False, 'allow_null': True},
+            'purchase_date': {'required': False, 'allow_null': True},
+        }
 
 
 class EquipmentStatusUpdateSerializer(serializers.Serializer):

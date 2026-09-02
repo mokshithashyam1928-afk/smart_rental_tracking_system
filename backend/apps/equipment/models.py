@@ -155,3 +155,9 @@ class Equipment(models.Model):
         if self.last_maintenance_hours is None:
             return float(self.maintenance_interval_hours)
         return max(0.0, (self.last_maintenance_hours + self.maintenance_interval_hours) - current_engine_hours)
+
+    def save(self, *args, **kwargs):
+        """Auto-populate qr_code with equipment_id if not present."""
+        if not self.qr_code and self.equipment_id:
+            self.qr_code = self.equipment_id
+        super().save(*args, **kwargs)

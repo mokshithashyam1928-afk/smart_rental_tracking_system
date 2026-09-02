@@ -2,7 +2,7 @@
  * api.ts — Real backend integration for Caterpillar Smart Rental Tracking System
  * Connects to Django backend at http://localhost:8000 via JWT-authenticated REST API.
  */
-import type { Asset, DashboardStat, Rental, Role, User } from '../types'
+import type { Asset, DashboardStat, OperatorItem, Rental, ResolvedEquipment, Role, SiteItem, User } from '../types'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -111,13 +111,13 @@ function adaptEquipment(eq: Record<string, unknown>): Asset {
 }
 
 function adaptRental(r: Record<string, unknown>): Rental {
-  const eq = (r.equipment as Record<string, unknown>) || {}
-  const site = (r.site as Record<string, unknown>) || {}
-  const operator = (r.operator as Record<string, unknown>) || {}
+  const eq = (r.equipment_detail as Record<string, unknown>) || (r.equipment as Record<string, unknown>) || {}
+  const site = (r.site_detail as Record<string, unknown>) || (r.site as Record<string, unknown>) || {}
+  const operator = (r.operator_detail as Record<string, unknown>) || (r.operator as Record<string, unknown>) || {}
   return {
-    id: r.rental_reference as string,
-    equipmentId: eq.equipment_id as string,
-    equipmentName: (eq.model as string) || (eq.equipment_type as string),
+    id: (r.rental_reference as string) || (r.id ? `RNT-${r.id}` : 'RNT'),
+    equipmentId: (eq.equipment_id as string) || '',
+    equipmentName: (eq.model as string) || (eq.equipment_type as string) || (eq.equipment_id as string) || 'Equipment',
     operator: (operator.name as string) || '',
     site: (site.name as string) || '',
     startDate: r.checkout_at ? (r.checkout_at as string).split('T')[0] : '',
@@ -281,4 +281,69 @@ export const api = {
       body: JSON.stringify({ rental_id: rentalId }),
     })
   },
+
+  // QR / Identifier Resolution
+  async resolveEquipmentIdentifier(identifier: string, identifierType: 'QR' | 'RFID' = 'QR'): Promise<ResolvedEquipment> {
+    return request<ResolvedEquipment>('/api/equipment/resolve_identifier/', {
+      method: 'POST',
+      body: JSON.stringify({
+        identifier_type: identifierType,
+        identifier: identifier.trim(),
+      }),
+    })
+  },
+
+  // Operators list
+  async getOperators(): Promise<OperatorItem[]> {
+    const res = await request<{ results?: OperatorItem[] } | OperatorItem[]>('/api/operators/')
+    return Array.isArray(res) ? res : (res as { results?: OperatorItem[] }).results ?? []
+  },
+
+  // Sites list
+  async getSites(): Promise<SiteItem[]> {
+    const res = await request<{ results?: SiteItem[] } | SiteItem[]>('/api/sites/')
+    return Array.isArray(res) ? res : (res as { results?: SiteItem[] }).results ?? []
+  },
+
+  // Raw Equipment list with full database IDs
+  async getRawEquipment(): Promise<ResolvedEquipment[]> {
+    const res = await request<{ results?: ResolvedEquipment[] } | ResolvedEquipment[]>('/api/equipment/')
+    return Array.isArray(res) ? res : (res as { results?: ResolvedEquipment[] }).results ?? []
+  },
+
+  // Register new vehicle
+  async registerEquipment(payload: {
+    equipment_id: string
+    model: string
+    equipment_type: string
+    site?: number | null
+    serial_number?: string
+  }): Promise<ResolvedEquipment> {
+    return request<ResolvedEquipment>('/api/equipment/', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
+
+  // Unified atomic QR Gate Scan
+  async scanQrGate(payload: {
+    qr_code: string
+    operator_id?: number | ''
+    site_id?: number | ''
+    due_hours?: number
+  }): Promise<{
+    action: 'CHECK_OUT' | 'CHECK_IN'
+    equipment: ResolvedEquipment
+    rental: Record<string, unknown> | null
+  }> {
+    return request<{
+      action: 'CHECK_OUT' | 'CHECK_IN'
+      equipment: ResolvedEquipment
+      rental: Record<string, unknown> | null
+    }>('/api/rentals/qr_scan/', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
 }
+

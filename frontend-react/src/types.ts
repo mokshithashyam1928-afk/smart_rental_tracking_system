@@ -1,6 +1,6 @@
 export type Role = 'ADMIN' | 'MANAGER' | 'OPERATOR' | 'VIEWER'
 
-export type EquipmentStatus = 'IN_USE' | 'AVAILABLE' | 'IDLE' | 'OVERDUE' | 'OFFLINE'
+export type EquipmentStatus = 'AVAILABLE' | 'RENTED' | 'IN_USE' | 'IDLE' | 'MAINTENANCE' | 'OVERDUE' | 'OFFLINE'
 
 export type Asset = {
   id: string
@@ -43,3 +43,46 @@ export type User = {
   role: Role
   token: string
 }
+
+export type SiteItem = {
+  id: number
+  site_code: string
+  name: string
+  address?: string
+  status?: string
+}
+
+export type OperatorItem = {
+  id: number
+  employee_id: string
+  name: string
+  phone?: string
+  email?: string
+  status?: string
+}
+
+export type ResolvedEquipment = {
+  id: number
+  equipment_id: string
+  equipment_type: string
+  manufacturer: string
+  model: string
+  serial_number?: string
+  qr_code?: string
+  rfid_uid?: string
+  status: string
+  site?: number | null
+  site_detail?: SiteItem | null
+  current_operator?: number | null
+  operator_detail?: OperatorItem | null
+  active_rental?: {
+    id: number
+    rental_reference: string
+    checkout_at: string
+    due_at: string
+    status: string
+    operator_detail?: OperatorItem
+    site_detail?: SiteItem
+  } | null
+}
+

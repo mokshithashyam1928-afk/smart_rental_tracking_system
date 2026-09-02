@@ -138,3 +138,129 @@ class RentalViewSet(viewsets.ReadOnlyModelViewSet):
             data=serializer.data,
             message='Rental history retrieved successfully'
         )
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated, CanManageRentals])
+    def qr_scan(self, request):
+        """
+        Unified atomic QR scan endpoint:
+        - Takes vehicle QR code / registration number
+        - If vehicle is in yard (AVAILABLE/IDLE) -> Automatically Check Out to specified/default operator & site
+        - If vehicle is deployed (RENTED/ACTIVE/OVERDUE) -> Automatically Check In & return to yard
+        """
+        qr_code = request.data.get('qr_code', '').strip()
+        if not qr_code:
+            return APIResponse.error(
+                code='VALIDATION_ERROR',
+                message='QR code is required',
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+        
+        cleaned_id = qr_code
+        if ':' in cleaned_id:
+            cleaned_id = cleaned_id.split(':', 1)[1].strip()
+        
+        from apps.equipment.models import Equipment
+        from apps.equipment.serializers import EquipmentSerializer
+        from apps.operators.models import Operator
+        from apps.sites.models import Site
+        from django.db.models import Q
+        import datetime
+        from django.utils import timezone
+        
+        equipment = Equipment.objects.filter(
+            Q(qr_code=qr_code) |
+            Q(qr_code=cleaned_id) |
+            Q(equipment_id=qr_code) |
+            Q(equipment_id=cleaned_id) |
+            Q(serial_number=qr_code)
+        ).first()
+        
+        if not equipment:
+            return APIResponse.error(
+                code='EQUIPMENT_NOT_FOUND',
+                message=f'Vehicle with registration / QR "{qr_code}" not found in system.',
+                status_code=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Check active rental
+        active_rental = Rental.objects.filter(
+            equipment=equipment,
+            status__in=[Rental.STATUS_CHECKED_OUT, Rental.STATUS_ACTIVE, Rental.STATUS_OVERDUE],
+            checkin_at__isnull=True
+        ).first()
+
+        is_currently_checked_out = (
+            active_rental is not None or
+            equipment.status in [Equipment.STATUS_RENTED, Equipment.STATUS_IN_USE, Equipment.STATUS_OVERDUE]
+        )
+
+        if is_currently_checked_out:
+            # 2nd Scan: Vehicle is deployed -> Automatically CHECK-IN
+            if active_rental:
+                rental = RentalService.checkin_equipment(rental_id=active_rental.id, user=request.user)
+            else:
+                rental = None
+            
+            equipment.status = Equipment.STATUS_AVAILABLE
+            equipment.current_operator = None
+            equipment.save()
+            equipment.refresh_from_db()
+
+            return APIResponse.success(
+                data={
+                    'action': 'CHECK_IN',
+                    'equipment': EquipmentSerializer(equipment).data,
+                    'rental': RentalSerializer(rental).data if rental else None,
+                },
+                message=f'Checked In: {equipment.equipment_id} returned and marked AVAILABLE'
+            )
+        else:
+            # 1st Scan: Vehicle is in yard (AVAILABLE) -> Automatically CHECK-OUT
+            operator_id = request.data.get('operator_id')
+            site_id = request.data.get('site_id')
+            due_hours = int(request.data.get('due_hours', 24))
+            
+            if operator_id:
+                operator = Operator.objects.filter(id=operator_id).first()
+            else:
+                operator = Operator.objects.filter(status=Operator.STATUS_ACTIVE).first()
+            
+            if site_id:
+                site = Site.objects.filter(id=site_id).first()
+            elif equipment.site:
+                site = equipment.site
+            else:
+                site = Site.objects.filter(status=Site.STATUS_ACTIVE).first()
+            
+            if not operator:
+                return APIResponse.error(
+                    code='OPERATOR_NOT_FOUND',
+                    message='No active operator found for checkout assignment.',
+                    status_code=status.HTTP_400_BAD_REQUEST
+                )
+            if not site:
+                return APIResponse.error(
+                    code='SITE_NOT_FOUND',
+                    message='No active destination site found for checkout assignment.',
+                    status_code=status.HTTP_400_BAD_REQUEST
+                )
+            
+            due_at = timezone.now() + datetime.timedelta(hours=due_hours)
+            
+            rental = RentalService.checkout_equipment(
+                equipment_id=equipment.id,
+                operator_id=operator.id,
+                site_id=site.id,
+                due_at=due_at,
+                user=request.user
+            )
+            equipment.refresh_from_db()
+
+            return APIResponse.success(
+                data={
+                    'action': 'CHECK_OUT',
+                    'equipment': EquipmentSerializer(equipment).data,
+                    'rental': RentalSerializer(rental).data,
+                },
+                message=f'Checked Out: {equipment.equipment_id} dispatched to {site.name}'
+            )

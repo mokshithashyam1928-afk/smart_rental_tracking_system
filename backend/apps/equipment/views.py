@@ -1,6 +1,5 @@
-"""
-Views for equipment app.
-"""
+from django.db import models
+from django.db.models import Q
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -39,6 +38,16 @@ class EquipmentViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             self.permission_classes = [IsAuthenticated, CanManageEquipment]
         return super().get_permissions()
+
+    def create(self, request, *args, **kwargs):
+        """Create and register new equipment."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        return APIResponse.created(
+            data=EquipmentSerializer(instance).data,
+            message="Equipment registered successfully"
+        )
     
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def resolve_identifier(self, request):
@@ -57,14 +66,39 @@ class EquipmentViewSet(viewsets.ModelViewSet):
         
         try:
             if identifier_type == 'QR':
-                equipment = Equipment.objects.get(qr_code=identifier)
+                cleaned_id = identifier.strip()
+                # Strip common prefix formats if scanned from formatted QR (e.g., 'CAT:CAT-336-1001' or 'QR:...')
+                if ':' in cleaned_id:
+                    cleaned_id = cleaned_id.split(':', 1)[1].strip()
+                
+                equipment = Equipment.objects.filter(
+                    models.Q(qr_code=identifier) |
+                    models.Q(qr_code=cleaned_id) |
+                    models.Q(equipment_id=identifier) |
+                    models.Q(equipment_id=cleaned_id) |
+                    models.Q(serial_number=identifier)
+                ).first()
+                if not equipment:
+                    raise Equipment.DoesNotExist
             elif identifier_type == 'RFID':
                 equipment = Equipment.objects.get(rfid_uid=identifier)
             else:
                 raise EquipmentNotFoundError(detail='Unknown identifier type')
             
+            # Check for active rental
+            from apps.rentals.models import Rental
+            from apps.rentals.serializers import RentalSerializer
+            active_rental = Rental.objects.filter(
+                equipment=equipment,
+                status__in=[Rental.STATUS_CHECKED_OUT, Rental.STATUS_ACTIVE, Rental.STATUS_OVERDUE],
+                checkin_at__isnull=True
+            ).first()
+
+            data = EquipmentSerializer(equipment).data
+            data['active_rental'] = RentalSerializer(active_rental).data if active_rental else None
+
             return APIResponse.success(
-                data=EquipmentSerializer(equipment).data,
+                data=data,
                 message='Equipment resolved successfully'
             )
         except Equipment.DoesNotExist:
