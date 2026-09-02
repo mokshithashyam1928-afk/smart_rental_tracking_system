@@ -1,0 +1,6 @@
+site_code,name,latitude,longitude,status
+S-CAT-BLR01,Bengaluru Metro Underground Line 4,12.9716,77.5946,ACTIVE
+S-CAT-HYD02,Hyderabad Airport Expressway Phase 3,17.385,78.4867,ACTIVE
+S-CAT-MUM03,Mumbai Coastal Road Reclamation,18.987,72.815,ACTIVE
+S-CAT-KOL04,Raniganj Open-Cast Coal Mine,23.62,87.13,ACTIVE
+S-CAT-DEL05,Delhi-Mumbai Expressway Bridge,28.4595,77.0266,ACTIVE

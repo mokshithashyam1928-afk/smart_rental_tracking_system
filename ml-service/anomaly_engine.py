@@ -1,7 +1,8 @@
-"""
-Anomaly detection engine combining statistical z-score modeling and domain heuristic scoring.
-"""
+"""Anomaly detection using Isolation Forest plus domain safety rules."""
+from typing import Optional
+
 import numpy as np
+from sklearn.ensemble import IsolationForest
 
 
 class AnomalyDetectionEngine:
@@ -60,4 +61,66 @@ class AnomalyDetectionEngine:
                     'reason': f"Sudden fuel loss of {drop:.1f}% detected between consecutive readings. Potential fuel leak or theft."
                 })
 
+        # 4. Multivariate anomaly model for unusual combined telemetry behavior.
+        model_anomaly = self._detect_isolation_forest_anomaly(telemetry_window)
+        if model_anomaly:
+            known_types = {item["anomaly_type"] for item in anomalies}
+            if model_anomaly["anomaly_type"] not in known_types:
+                anomalies.append(model_anomaly)
+
         return anomalies
+
+    @staticmethod
+    def _safe_float(row: dict, key: str, default: float = 0.0) -> float:
+        try:
+            return float(row.get(key, default) or default)
+        except (TypeError, ValueError):
+            return default
+
+    def _detect_isolation_forest_anomaly(self, telemetry_window: list) -> Optional[dict]:
+        if len(telemetry_window) < 8:
+            return None
+
+        features = np.array(
+            [
+                [
+                    self._safe_float(row, "speed"),
+                    self._safe_float(row, "fuel_level"),
+                    self._safe_float(row, "idle_hours"),
+                    self._safe_float(row, "engine_hours"),
+                ]
+                for row in telemetry_window
+            ],
+            dtype=float,
+        )
+
+        if np.std(features, axis=0).sum() == 0:
+            return None
+
+        model = IsolationForest(contamination="auto", random_state=42)
+        labels = model.fit_predict(features)
+        scores = -model.score_samples(features)
+
+        latest_label = int(labels[-1])
+        if latest_label != -1:
+            return None
+
+        latest = telemetry_window[-1]
+        score = float(scores[-1])
+        percentile = float(np.mean(scores <= score))
+        severity = "HIGH" if percentile >= 0.95 else "MEDIUM"
+
+        return {
+            "equipment_id": latest.get("equipment_id", "UNKNOWN"),
+            "anomaly_type": "ML_TELEMETRY_OUTLIER",
+            "severity": severity,
+            "score": round(min(0.99, max(0.60, percentile)), 2),
+            "reason": "Telemetry pattern is unusual compared with the recent operating window.",
+            "metadata": {
+                "model": "IsolationForest",
+                "speed": self._safe_float(latest, "speed"),
+                "fuel_level": self._safe_float(latest, "fuel_level"),
+                "idle_hours": self._safe_float(latest, "idle_hours"),
+                "engine_hours": self._safe_float(latest, "engine_hours"),
+            },
+        }
