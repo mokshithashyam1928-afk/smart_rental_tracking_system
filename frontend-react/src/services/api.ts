@@ -132,14 +132,20 @@ function adaptRental(r: Record<string, unknown>): Rental {
 }
 
 function adaptDashboardStats(summary: Record<string, unknown>): DashboardStat[] {
+  const total = Number(summary.total ?? summary.total_equipment ?? 0)
+  const available = Number(summary.available ?? summary.available_equipment ?? 0)
+  const rented = Number(summary.rented ?? summary.rented_equipment ?? 0)
+  const inUse = Number(summary.in_use ?? summary.in_use_equipment ?? 0)
+  const idle = Number(summary.idle ?? summary.idle_equipment ?? 0)
+  const overdue = Number(summary.overdue ?? summary.overdue_equipment ?? 0)
+
   return [
-    { label: 'Total Assets', value: (summary.total_equipment as number) || 0, change: '', accent: 'amber' },
-    { label: 'Available', value: (summary.available as number) || 0, change: '', accent: 'teal' },
-    { label: 'Rented', value: (summary.rented as number) || 0, change: '', accent: 'slate' },
-    { label: 'In Use', value: (summary.in_use as number) || 0, change: '', accent: 'amber' },
-    { label: 'Idle', value: (summary.idle as number) || 0, change: '', accent: 'slate' },
-    { label: 'Overdue', value: (summary.overdue as number) || 0, change: '', accent: 'rose' },
-    { label: 'Offline', value: (summary.offline as number) || 0, change: '', accent: 'slate' },
+    { label: 'Total Assets', value: total, change: '', accent: 'amber' },
+    { label: 'Available', value: available, change: '', accent: 'teal' },
+    { label: 'Rented', value: rented, change: '', accent: 'slate' },
+    { label: 'In Use', value: inUse, change: '', accent: 'amber' },
+    { label: 'Idle', value: idle, change: '', accent: 'slate' },
+    { label: 'Overdue', value: overdue, change: '', accent: 'rose' },
   ]
 }
 

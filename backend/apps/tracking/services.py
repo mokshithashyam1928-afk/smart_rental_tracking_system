@@ -11,17 +11,29 @@ class DashboardService:
     
     @staticmethod
     def get_equipment_summary():
-        """Get summary of equipment by status."""
+        """Get summary of equipment by status based on real registered data."""
+        from apps.rentals.models import Rental
+        from django.utils import timezone
         equipment = Equipment.objects.all()
+        now = timezone.now()
+        
+        overdue_count = Rental.objects.filter(
+            Q(status=Rental.STATUS_OVERDUE) |
+            Q(status__in=[Rental.STATUS_ACTIVE, Rental.STATUS_CHECKED_OUT], due_at__lt=now, checkin_at__isnull=True)
+        ).count()
+        
+        rented_count = equipment.filter(status__in=[Equipment.STATUS_RENTED, Equipment.STATUS_IN_USE]).count()
+        available_count = equipment.filter(status=Equipment.STATUS_AVAILABLE).count()
+        idle_count = equipment.filter(status=Equipment.STATUS_IDLE).count()
         
         return {
             'total': equipment.count(),
-            'available': equipment.filter(status=Equipment.STATUS_AVAILABLE).count(),
-            'rented': equipment.filter(status=Equipment.STATUS_RENTED).count(),
-            'in_use': equipment.filter(status=Equipment.STATUS_IN_USE).count(),
-            'idle': equipment.filter(status=Equipment.STATUS_IDLE).count(),
+            'available': available_count,
+            'rented': rented_count,
+            'in_use': rented_count,
+            'idle': idle_count,
             'maintenance': equipment.filter(status=Equipment.STATUS_MAINTENANCE).count(),
-            'overdue': equipment.filter(status=Equipment.STATUS_OVERDUE).count(),
+            'overdue': overdue_count,
             'offline': equipment.filter(status=Equipment.STATUS_OFFLINE).count(),
         }
     
