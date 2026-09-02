@@ -57,6 +57,60 @@ export function DashboardPage() {
     load()
   }, [])
 
+  // ── Live WebSocket: Kafka → Django Channels → Dashboard ─────────────────
+  useEffect(() => {
+    const wsUrl = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws/dashboard/`
+    let ws: WebSocket | null = null
+    let retryTimer: ReturnType<typeof setTimeout> | null = null
+    let retries = 0
+
+    const connect = () => {
+      ws = new WebSocket(wsUrl)
+
+      ws.onopen = () => {
+        retries = 0
+        console.info('[WS] Dashboard WebSocket connected')
+      }
+
+      ws.onmessage = (evt) => {
+        try {
+          const msg = JSON.parse(evt.data)
+          if (msg.type === 'dashboard.fleet_update') {
+            const summary = msg.payload?.summary
+            if (summary) {
+              setStats([
+                { label: 'Total Assets', value: summary.total ?? 0, change: '', accent: 'amber' },
+                { label: 'Available', value: summary.available ?? 0, change: '', accent: 'teal' },
+                { label: 'Rented', value: summary.rented ?? 0, change: '', accent: 'slate' },
+                { label: 'In Use', value: summary.rented ?? 0, change: '', accent: 'amber' },
+                { label: 'Idle', value: summary.idle ?? 0, change: '', accent: 'slate' },
+                { label: 'Overdue', value: summary.overdue ?? 0, change: '', accent: 'rose' },
+              ])
+            }
+          }
+        } catch {
+          // malformed frame – ignore
+        }
+      }
+
+      ws.onclose = () => {
+        // Reconnect with exponential back-off (max 30 s)
+        const delay = Math.min(1000 * 2 ** retries, 30000)
+        retries += 1
+        retryTimer = setTimeout(connect, delay)
+      }
+
+      ws.onerror = () => ws?.close()
+    }
+
+    connect()
+    return () => {
+      if (retryTimer) clearTimeout(retryTimer)
+      ws?.close()
+    }
+  }, [])
+  // ─────────────────────────────────────────────────────────────────────────
+
   // Helper to calculate runtime stats
   const getDurationStats = (rental: Rental) => {
     if (!rental.startDate) {

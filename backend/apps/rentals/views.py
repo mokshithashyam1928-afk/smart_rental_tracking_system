@@ -19,6 +19,7 @@ from common.exceptions import (
     EquipmentNotAvailableError, OperatorNotActiveError, SiteNotActiveError
 )
 from common.responses import APIResponse
+from common.events.publisher import DomainEventPublisher
 
 
 class RentalViewSet(viewsets.ReadOnlyModelViewSet):
@@ -52,6 +53,17 @@ class RentalViewSet(viewsets.ReadOnlyModelViewSet):
                 due_at=serializer.validated_data['due_at'],
                 user=request.user
             )
+            DomainEventPublisher.publish(
+                topic=DomainEventPublisher.TOPIC_RENTALS,
+                event_type='rental.checked_out',
+                payload={
+                    'action': 'CHECK_OUT',
+                    'equipment_id': str(serializer.validated_data['equipment_id']),
+                    'site': str(serializer.validated_data.get('site_id', '')),
+                    'operator': str(serializer.validated_data.get('operator_id', '')),
+                },
+                user=request.user,
+            )
             return APIResponse.created(
                 data=RentalSerializer(rental).data,
                 message='Equipment checked out successfully'
@@ -79,6 +91,15 @@ class RentalViewSet(viewsets.ReadOnlyModelViewSet):
             rental = RentalService.checkin_equipment(
                 rental_id=serializer.validated_data['rental_id'],
                 user=request.user
+            )
+            DomainEventPublisher.publish(
+                topic=DomainEventPublisher.TOPIC_RENTALS,
+                event_type='rental.checked_in',
+                payload={
+                    'action': 'CHECK_IN',
+                    'rental_id': str(serializer.validated_data['rental_id']),
+                },
+                user=request.user,
             )
             return APIResponse.success(
                 data=RentalSerializer(rental).data,
@@ -206,6 +227,18 @@ class RentalViewSet(viewsets.ReadOnlyModelViewSet):
             equipment.save()
             equipment.refresh_from_db()
 
+            DomainEventPublisher.publish(
+                topic=DomainEventPublisher.TOPIC_RENTALS,
+                event_type='rental.qr_checked_in',
+                payload={
+                    'action': 'CHECK_IN',
+                    'equipment_id': equipment.equipment_id,
+                    'model': equipment.model,
+                    'site': active_rental.site.name if active_rental and active_rental.site else '',
+                    'operator': active_rental.operator.employee_id if active_rental and active_rental.operator else '',
+                },
+                user=request.user,
+            )
             return APIResponse.success(
                 data={
                     'action': 'CHECK_IN',
@@ -256,6 +289,18 @@ class RentalViewSet(viewsets.ReadOnlyModelViewSet):
             )
             equipment.refresh_from_db()
 
+            DomainEventPublisher.publish(
+                topic=DomainEventPublisher.TOPIC_RENTALS,
+                event_type='rental.qr_checked_out',
+                payload={
+                    'action': 'CHECK_OUT',
+                    'equipment_id': equipment.equipment_id,
+                    'model': equipment.model,
+                    'site': site.name,
+                    'operator': operator.employee_id if operator else '',
+                },
+                user=request.user,
+            )
             return APIResponse.success(
                 data={
                     'action': 'CHECK_OUT',

@@ -32,7 +32,7 @@ export function Navbar() {
   const [readIds, setReadIds] = useState<Set<string>>(new Set())
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Load real rental overdue & approaching return alerts
+  // Load real rental overdue & approaching return alerts (initial + polling)
   useEffect(() => {
     const loadAlerts = async () => {
       try {
@@ -45,7 +45,6 @@ export function Navbar() {
             const due = new Date(r.endDate).getTime()
             if (!isNaN(due)) {
               if (now > due) {
-                // OVERDUE ALERT
                 const diffHours = Math.floor((now - due) / (1000 * 60 * 60))
                 alertList.push({
                   id: `ovd-${r.id}`,
@@ -58,7 +57,6 @@ export function Navbar() {
                   timeText: 'Past Due',
                 })
               } else if (due - now <= 4 * 3600 * 1000) {
-                // APPROACHING RETURN REMINDER
                 const remHours = Math.max(1, Math.floor((due - now) / (1000 * 60 * 60)))
                 alertList.push({
                   id: `app-${r.id}`,
@@ -85,6 +83,57 @@ export function Navbar() {
     const interval = setInterval(loadAlerts, 30000)
     return () => clearInterval(interval)
   }, [])
+
+  // ── Live WebSocket: Kafka → Django Channels → Instant overdue alerts ──────
+  useEffect(() => {
+    const wsUrl = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws/dashboard/`
+    let ws: WebSocket | null = null
+    let retryTimer: ReturnType<typeof setTimeout> | null = null
+    let retries = 0
+
+    const connect = () => {
+      ws = new WebSocket(wsUrl)
+      ws.onopen = () => { retries = 0 }
+
+      ws.onmessage = (evt) => {
+        try {
+          const msg = JSON.parse(evt.data)
+          if (msg.type === 'dashboard.overdue_alert') {
+            const p = msg.payload
+            const newAlert: NotificationItem = {
+              id: `ws-ovd-${p.equipment_id}-${Date.now()}`,
+              type: 'OVERDUE',
+              title: `OVERDUE: ${p.model || p.equipment_id}`,
+              message: p.message || 'Vehicle return is overdue. Immediate check-in required.',
+              equipmentId: p.equipment_id || '',
+              site: p.site || 'Job Site',
+              operator: p.operator || 'Assigned Operator',
+              timeText: 'Just Now',
+            }
+            setNotifications((prev) => {
+              const filtered = prev.filter((n) => n.equipmentId !== newAlert.equipmentId)
+              return [newAlert, ...filtered]
+            })
+          }
+        } catch { /* ignore malformed frames */ }
+      }
+
+      ws.onclose = () => {
+        const delay = Math.min(1000 * 2 ** retries, 30000)
+        retries += 1
+        retryTimer = setTimeout(connect, delay)
+      }
+      ws.onerror = () => ws?.close()
+    }
+
+    connect()
+    return () => {
+      if (retryTimer) clearTimeout(retryTimer)
+      ws?.close()
+    }
+  }, [])
+  // ─────────────────────────────────────────────────────────────────────────
+
 
   // Close dropdown on outside click
   useEffect(() => {
