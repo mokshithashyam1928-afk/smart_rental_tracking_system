@@ -2,7 +2,7 @@
  * api.ts — Real backend integration for Caterpillar Smart Rental Tracking System
  * Connects to Django backend at http://localhost:8000 via JWT-authenticated REST API.
  */
-import type { Asset, DashboardStat, OperatorItem, Rental, ResolvedEquipment, Role, SiteItem, User } from '../types'
+import type { Asset, DashboardStat, OperatorItem, Rental, ResolvedEquipment, Role, SiteItem, User, ForecastItem, AnomalyItem, RecommendationItem } from '../types'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -256,12 +256,6 @@ export const api = {
     return request('/api/analytics/')
   },
 
-  // Anomalies
-  async getAnomalies(): Promise<unknown[]> {
-    const res = await request<{ results?: unknown[] } | unknown[]>('/api/anomalies/')
-    return Array.isArray(res) ? res : (res as { results?: unknown[] }).results ?? []
-  },
-
   // Notifications
   async getNotifications(): Promise<unknown[]> {
     const res = await request<{ results?: unknown[] } | unknown[]>('/api/notifications/')
@@ -351,5 +345,68 @@ export const api = {
       body: JSON.stringify(payload),
     })
   },
+
+  // ---------------------------------------------------------------------------
+  // ML Intelligence APIs (Demand Forecasting, Anomaly Detection, Recommendations)
+  // ---------------------------------------------------------------------------
+  async getForecasts(): Promise<ForecastItem[]> {
+    const res = await request<{ results?: ForecastItem[] } | ForecastItem[]>('/api/forecasting/')
+    return Array.isArray(res) ? res : (res as { results?: ForecastItem[] }).results ?? []
+  },
+
+  async generateForecasts(): Promise<ForecastItem[]> {
+    return request<ForecastItem[]>('/api/forecasting/generate/', { method: 'POST' })
+  },
+
+  async getForecastSummary(): Promise<Record<string, unknown>> {
+    return request<Record<string, unknown>>('/api/forecasting/summary/')
+  },
+
+  async getAnomalies(): Promise<AnomalyItem[]> {
+    const res = await request<{ results?: AnomalyItem[] } | AnomalyItem[]>('/api/anomalies/')
+    return Array.isArray(res) ? res : (res as { results?: AnomalyItem[] }).results ?? []
+  },
+
+  async scanAnomalies(): Promise<AnomalyItem[]> {
+    return request<AnomalyItem[]>('/api/anomalies/scan/', { method: 'POST' })
+  },
+
+  async acknowledgeAnomaly(id: number, notes = ''): Promise<AnomalyItem> {
+    return request<AnomalyItem>(`/api/anomalies/${id}/acknowledge/`, {
+      method: 'POST',
+      body: JSON.stringify({ notes }),
+    })
+  },
+
+  async resolveAnomaly(id: number, notes = ''): Promise<AnomalyItem> {
+    return request<AnomalyItem>(`/api/anomalies/${id}/resolve/`, {
+      method: 'POST',
+      body: JSON.stringify({ notes }),
+    })
+  },
+
+  async getRecommendations(): Promise<RecommendationItem[]> {
+    const res = await request<{ results?: RecommendationItem[] } | RecommendationItem[]>('/api/recommendations/')
+    return Array.isArray(res) ? res : (res as { results?: RecommendationItem[] }).results ?? []
+  },
+
+  async generateRecommendations(): Promise<RecommendationItem[]> {
+    return request<RecommendationItem[]>('/api/recommendations/generate/', { method: 'POST' })
+  },
+
+  async acceptRecommendation(id: number, notes = ''): Promise<RecommendationItem> {
+    return request<RecommendationItem>(`/api/recommendations/${id}/accept/`, {
+      method: 'POST',
+      body: JSON.stringify({ notes }),
+    })
+  },
+
+  async dismissRecommendation(id: number, notes = ''): Promise<RecommendationItem> {
+    return request<RecommendationItem>(`/api/recommendations/${id}/dismiss/`, {
+      method: 'POST',
+      body: JSON.stringify({ notes }),
+    })
+  },
 }
+
 

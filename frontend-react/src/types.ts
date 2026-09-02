@@ -86,3 +86,47 @@ export type ResolvedEquipment = {
   } | null
 }
 
+export type ForecastItem = {
+  id: number
+  site: number
+  site_name?: string
+  equipment_type: string
+  forecast_date: string
+  predicted_demand: number
+  confidence: number
+  model_version: string
+  generated_at?: string
+}
+
+export type AnomalyItem = {
+  id: number
+  equipment: number
+  equipment_id?: string
+  equipment_model?: string
+  detected_at: string
+  anomaly_type: string
+  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  score: number
+  reason: string
+  status: 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED' | 'FALSE_POSITIVE'
+  metadata?: Record<string, unknown>
+}
+
+export type RecommendationItem = {
+  id: number
+  equipment: number
+  equipment_id?: string
+  equipment_model?: string
+  source_site: number
+  source_site_name?: string
+  target_site: number
+  target_site_name?: string
+  reason: string
+  current_utilization: number
+  predicted_target_demand: number
+  score: number
+  status: 'PENDING' | 'ACCEPTED' | 'DISMISSED' | 'EXPIRED'
+  created_at: string
+}
+
+

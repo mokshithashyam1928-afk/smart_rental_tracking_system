@@ -5,24 +5,38 @@ import {
   AlertCircle,
   AlertTriangle,
   ArrowDownLeft,
+  ArrowRight,
   ArrowUpRight,
   Bell,
+  Brain,
   Camera,
+  Check,
   Clock,
   Fuel,
   Gauge,
   MapPin,
   PlusCircle,
+  RefreshCw,
   ShieldAlert,
+  Sparkles,
   Timer,
+  TrendingUp,
   Truck,
+  Zap,
 } from 'lucide-react'
 import { Navbar } from '../components/Navbar'
 import { Sidebar } from '../components/Sidebar'
 import { StatCard } from '../components/StatCard'
 import { useAuth } from '../context/AuthContext'
 import { api } from '../services/api'
-import type { DashboardStat, Rental, SiteItem } from '../types'
+import type {
+  AnomalyItem,
+  DashboardStat,
+  ForecastItem,
+  RecommendationItem,
+  Rental,
+  SiteItem,
+} from '../types'
 
 const defaultStats: DashboardStat[] = [
   { label: 'Total Assets', value: 0, change: '', accent: 'amber' },
@@ -39,22 +53,35 @@ export function DashboardPage() {
   const [rentals, setRentals] = useState<Rental[]>([])
   const [sites, setSites] = useState<SiteItem[]>([])
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const [nextStats, nextRentals, nextSites] = await Promise.all([
-          api.getDashboardStats().catch(() => defaultStats),
-          api.getRentals().catch(() => []),
-          api.getSites().catch(() => []),
-        ])
-        setStats(nextStats)
-        setRentals(nextRentals)
-        setSites(nextSites)
-      } catch {
-        // use default stats
-      }
+  // ML Intelligence State
+  const [forecasts, setForecasts] = useState<ForecastItem[]>([])
+  const [anomalies, setAnomalies] = useState<AnomalyItem[]>([])
+  const [recommendations, setRecommendations] = useState<RecommendationItem[]>([])
+  const [actionLoading, setActionLoading] = useState<string | null>(null)
+
+  const loadData = async () => {
+    try {
+      const [nextStats, nextRentals, nextSites, fcList, anList, recList] = await Promise.all([
+        api.getDashboardStats().catch(() => defaultStats),
+        api.getRentals().catch(() => []),
+        api.getSites().catch(() => []),
+        api.getForecasts().catch(() => [] as ForecastItem[]),
+        api.getAnomalies().catch(() => [] as AnomalyItem[]),
+        api.getRecommendations().catch(() => [] as RecommendationItem[]),
+      ])
+      setStats(nextStats)
+      setRentals(nextRentals)
+      setSites(nextSites)
+      setForecasts(fcList)
+      setAnomalies(anList)
+      setRecommendations(recList)
+    } catch {
+      // fallback
     }
-    load()
+  }
+
+  useEffect(() => {
+    loadData()
   }, [])
 
   // ── Live WebSocket: Kafka → Django Channels → Dashboard ─────────────────
@@ -94,7 +121,6 @@ export function DashboardPage() {
       }
 
       ws.onclose = () => {
-        // Reconnect with exponential back-off (max 30 s)
         const delay = Math.min(1000 * 2 ** retries, 30000)
         retries += 1
         retryTimer = setTimeout(connect, delay)
@@ -109,9 +135,78 @@ export function DashboardPage() {
       ws?.close()
     }
   }, [])
-  // ─────────────────────────────────────────────────────────────────────────
 
-  // Helper to calculate runtime stats
+  // Action Handlers for ML Intelligence
+  const handleGenerateForecasts = async () => {
+    try {
+      setActionLoading('fc')
+      const newFc = await api.generateForecasts()
+      setForecasts(newFc)
+    } catch (err) {
+      console.error('Forecast generation failed:', err)
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleScanAnomalies = async () => {
+    try {
+      setActionLoading('an')
+      const newAn = await api.scanAnomalies()
+      setAnomalies(newAn)
+    } catch (err) {
+      console.error('Anomaly scan failed:', err)
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleGenerateRecommendations = async () => {
+    try {
+      setActionLoading('rec')
+      const newRecs = await api.generateRecommendations()
+      setRecommendations(newRecs)
+    } catch (err) {
+      console.error('Recommendation generation failed:', err)
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleAcceptRecommendation = async (id: number) => {
+    try {
+      await api.acceptRecommendation(id)
+      setRecommendations((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status: 'ACCEPTED' } : r))
+      )
+      loadData()
+    } catch (err) {
+      console.error('Accept recommendation failed:', err)
+    }
+  }
+
+  const handleDismissRecommendation = async (id: number) => {
+    try {
+      await api.dismissRecommendation(id)
+      setRecommendations((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status: 'DISMISSED' } : r))
+      )
+    } catch (err) {
+      console.error('Dismiss recommendation failed:', err)
+    }
+  }
+
+  const handleAcknowledgeAnomaly = async (id: number) => {
+    try {
+      await api.acknowledgeAnomaly(id)
+      setAnomalies((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status: 'ACKNOWLEDGED' } : a))
+      )
+    } catch (err) {
+      console.error('Acknowledge anomaly failed:', err)
+    }
+  }
+
   const getDurationStats = (rental: Rental) => {
     if (!rental.startDate) {
       return { hours: 1, text: '1h 0m', fuelLiters: 14.5, isOverdue: false, isApproaching: false }
@@ -123,22 +218,12 @@ export function DashboardPage() {
     const hoursInt = Math.floor(totalHours)
     const minutesInt = Math.floor((totalHours - hoursInt) * 60)
 
-    let isOverdue = false
-    let isApproaching = false
-
-    if (rental.status === 'ACTIVE' && rental.endDate) {
-      const due = new Date(rental.endDate).getTime()
-      if (!isNaN(due)) {
-        if (now > due) {
-          isOverdue = true
-        } else if (due - now <= 4 * 3600 * 1000) {
-          isApproaching = true
-        }
-      }
-    }
+    const end = rental.endDate ? new Date(rental.endDate).getTime() : 0
+    const isOverdue = end > 0 && now > end
+    const isApproaching = end > 0 && !isOverdue && end - now <= 4 * 3600 * 1000
 
     return {
-      hours: totalHours,
+      hours: Math.round(totalHours * 10) / 10,
       text: `${hoursInt}h ${minutesInt}m`,
       fuelLiters: Math.round(totalHours * 14.5 * 10) / 10,
       isOverdue,
@@ -146,7 +231,6 @@ export function DashboardPage() {
     }
   }
 
-  // Aggregate Usage Metrics across registered contracts
   const usageSummary = useMemo(() => {
     let totalRentedHours = 0
     let totalFuelConsumed = 0
@@ -173,6 +257,18 @@ export function DashboardPage() {
     }
   }, [rentals])
 
+  const openAnomalies = useMemo(() => anomalies.filter((a) => a.status === 'OPEN'), [anomalies])
+  const pendingRecommendations = useMemo(
+    () => recommendations.filter((r) => r.status === 'PENDING'),
+    [recommendations]
+  )
+
+  const siteMap = useMemo(() => {
+    const map = new Map<number, string>()
+    sites.forEach((s) => map.set(s.id, s.name))
+    return map
+  }, [sites])
+
   return (
     <div className="flex min-h-screen bg-[#fcf9f7] text-stone-900">
       <Sidebar role={user?.role ?? 'VIEWER'} />
@@ -188,6 +284,20 @@ export function DashboardPage() {
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-900">
                   <Gauge size={13} className="text-amber-600" />
                   Live Operational Telematics
+                </span>
+
+                {/* Quick Summary ML Badges near top */}
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-purple-900">
+                  <TrendingUp size={13} className="text-purple-600" />
+                  {forecasts.length} Forecasts
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-rose-900">
+                  <Zap size={13} className="text-rose-600" />
+                  {openAnomalies.length} Active Anomalies
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-indigo-900">
+                  <Brain size={13} className="text-indigo-600" />
+                  {pendingRecommendations.length} Recommendations
                 </span>
               </div>
               <h1 className="mt-2 text-2xl md:text-3xl font-extrabold text-stone-900 tracking-tight">
@@ -355,6 +465,273 @@ export function DashboardPage() {
                 {usageSummary.activeCount} <span className="text-sm font-semibold text-emerald-600">Active</span>
               </p>
               <p className="mt-1 text-[11px] text-stone-500">Across {sites.length} construction sites</p>
+            </div>
+          </div>
+
+          {/* ═════════════════════════════════════════════════════════════════════ */}
+          {/* ML INTELLIGENCE SECTION (Demand Forecasts, Anomaly Detection, Asset Reallocation) */}
+          {/* ═════════════════════════════════════════════════════════════════════ */}
+          <div className="space-y-4 pt-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200 pb-3">
+              <div>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-purple-900">
+                  <Sparkles size={13} className="text-purple-600" />
+                  Machine Learning & AI Operations
+                </span>
+                <h2 className="text-xl md:text-2xl font-extrabold text-stone-900 mt-1 tracking-tight">
+                  ML Intelligence
+                </h2>
+              </div>
+              <p className="text-xs text-stone-500 max-w-md">
+                Predictive equipment demand forecasts, real-time statistical anomaly detection, and automated site reallocation recommendations.
+              </p>
+            </div>
+
+            {/* 3 Side-by-Side Cards on Desktop, Vertical Stack on Mobile */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+              {/* CARD 1: Demand Forecasting ("Hybrid Demand Forecasts") */}
+              <div className="rounded-3xl border border-stone-200 bg-white p-5 md:p-6 shadow-sm flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md">
+                        Demand Model v2.1
+                      </span>
+                      <h3 className="text-lg font-extrabold text-stone-900 mt-1">Hybrid Demand Forecasts</h3>
+                    </div>
+                    <button
+                      onClick={handleGenerateForecasts}
+                      disabled={actionLoading === 'fc'}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 text-xs font-bold transition shadow-xs disabled:opacity-50 cursor-pointer"
+                    >
+                      <RefreshCw size={13} className={actionLoading === 'fc' ? 'animate-spin' : ''} />
+                      {actionLoading === 'fc' ? 'Generating...' : 'Forecast'}
+                    </button>
+                  </div>
+
+                  <p className="text-xs text-stone-500 mt-2 mb-4 leading-relaxed">
+                    Combines historical rental volume, active utilization, and weekday/weekend construction demand patterns.
+                  </p>
+
+                  <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                    {forecasts.length === 0 ? (
+                      <div className="py-8 text-center text-xs text-stone-400">
+                        No forecasts generated yet. Click &quot;Forecast&quot; above to run the hybrid demand regressor.
+                      </div>
+                    ) : (
+                      forecasts.slice(0, 5).map((fc) => (
+                        <div
+                          key={fc.id}
+                          className="rounded-2xl border border-purple-100 bg-purple-50/50 p-3 flex items-center justify-between text-xs"
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-extrabold text-stone-900">{fc.equipment_type}</span>
+                              <span className="text-[10px] font-semibold text-purple-700 bg-purple-100 px-1.5 py-0.5 rounded">
+                                {siteMap.get(fc.site) || fc.site_name || `Site #${fc.site}`}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-stone-500 mt-0.5">
+                              Target Date: <span className="font-medium text-stone-800">{fc.forecast_date}</span>
+                            </p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="font-extrabold text-purple-900 text-sm">{fc.predicted_demand} units</p>
+                            <p className="text-[10px] text-emerald-700 font-bold">
+                              {Math.round(fc.confidence * 100)}% confidence
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-stone-100 text-right">
+                  <span className="text-[11px] font-bold text-stone-400">
+                    Total Forecast Records: {forecasts.length}
+                  </span>
+                </div>
+              </div>
+
+              {/* CARD 2: Anomaly Detection ("Rules + Isolation Forest") */}
+              <div className="rounded-3xl border border-stone-200 bg-white p-5 md:p-6 shadow-sm flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">
+                        Anomaly Engine
+                      </span>
+                      <h3 className="text-lg font-extrabold text-stone-900 mt-1">Rules + Isolation Forest</h3>
+                    </div>
+                    <button
+                      onClick={handleScanAnomalies}
+                      disabled={actionLoading === 'an'}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 text-xs font-bold transition shadow-xs disabled:opacity-50 cursor-pointer"
+                    >
+                      <Zap size={13} className={actionLoading === 'an' ? 'animate-spin' : ''} />
+                      {actionLoading === 'an' ? 'Scanning...' : 'Scan Telemetry'}
+                    </button>
+                  </div>
+
+                  <p className="text-xs text-stone-500 mt-2 mb-4 leading-relaxed">
+                    Scans live telemetry for excessive idle hours, excessive speed, rapid fuel drops, unauthorized movement, and unusual patterns.
+                  </p>
+
+                  <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                    {anomalies.length === 0 ? (
+                      <div className="py-8 text-center text-xs text-stone-400">
+                        No telemetry anomalies detected. Click &quot;Scan Telemetry&quot; to run rule-based + Isolation Forest checks.
+                      </div>
+                    ) : (
+                      anomalies.slice(0, 5).map((an) => (
+                        <div
+                          key={an.id}
+                          className={`rounded-2xl border p-3 text-xs transition ${
+                            an.severity === 'CRITICAL' || an.severity === 'HIGH'
+                              ? 'bg-rose-50/80 border-rose-200'
+                              : 'bg-amber-50/80 border-amber-200'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-extrabold text-stone-900">{an.anomaly_type}</span>
+                            <span
+                              className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+                                an.severity === 'CRITICAL' || an.severity === 'HIGH'
+                                  ? 'bg-rose-200 text-rose-900'
+                                  : 'bg-amber-200 text-amber-900'
+                              }`}
+                            >
+                              {an.severity} ({an.score.toFixed(2)})
+                            </span>
+                          </div>
+                          <p className="text-[11px] font-mono text-stone-600 mt-1">
+                            Equipment: <span className="font-bold text-stone-900">{an.equipment_id || `Asset #${an.equipment}`}</span>
+                          </p>
+                          <p className="text-[11px] text-stone-700 mt-0.5 line-clamp-2 leading-snug">{an.reason}</p>
+
+                          <div className="mt-2.5 flex items-center justify-between pt-1.5 border-t border-stone-200/60">
+                            <span className="text-[10px] font-bold text-stone-500">Status: {an.status}</span>
+                            {an.status === 'OPEN' && (
+                              <button
+                                onClick={() => handleAcknowledgeAnomaly(an.id)}
+                                className="text-[10px] font-bold text-rose-700 hover:underline cursor-pointer"
+                              >
+                                Acknowledge →
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-[11px]">
+                  <span className="font-bold text-stone-500">Detected Issues: {anomalies.length}</span>
+                  <span className="font-extrabold text-rose-600">{openAnomalies.length} Open Alerts</span>
+                </div>
+              </div>
+
+              {/* CARD 3: Recommended Assets / Asset Reallocation ("Smart Asset Recommendations") */}
+              <div className="rounded-3xl border border-stone-200 bg-white p-5 md:p-6 shadow-sm flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
+                        Optimizer
+                      </span>
+                      <h3 className="text-lg font-extrabold text-stone-900 mt-1">Smart Asset Recommendations</h3>
+                    </div>
+                    <button
+                      onClick={handleGenerateRecommendations}
+                      disabled={actionLoading === 'rec'}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 text-xs font-bold transition shadow-xs disabled:opacity-50 cursor-pointer"
+                    >
+                      <Brain size={13} className={actionLoading === 'rec' ? 'animate-spin' : ''} />
+                      {actionLoading === 'rec' ? 'Evaluating...' : 'Re-Evaluate'}
+                    </button>
+                  </div>
+
+                  <p className="text-xs text-stone-500 mt-2 mb-4 leading-relaxed">
+                    Suggests moving idle/available machinery from low-demand sites to high-forecast construction sites.
+                  </p>
+
+                  <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                    {recommendations.length === 0 ? (
+                      <div className="py-8 text-center text-xs text-stone-400">
+                        No asset reallocation recommendations. Click &quot;Re-Evaluate&quot; to calculate optimal machine distribution.
+                      </div>
+                    ) : (
+                      recommendations.slice(0, 5).map((rec) => (
+                        <div
+                          key={rec.id}
+                          className="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-3 text-xs"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono font-bold text-stone-900">
+                              {rec.equipment_id || `Asset #${rec.equipment}`}
+                            </span>
+                            <span className="text-[10px] font-extrabold text-indigo-700 bg-indigo-100 px-1.5 py-0.5 rounded">
+                              Score: {rec.score.toFixed(2)}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 mt-1.5 text-[11px] font-bold text-stone-800">
+                            <span className="truncate max-w-[100px]">
+                              {siteMap.get(rec.source_site) || rec.source_site_name || `Site #${rec.source_site}`}
+                            </span>
+                            <ArrowRight size={12} className="text-indigo-600 shrink-0" />
+                            <span className="truncate max-w-[100px] text-indigo-900">
+                              {siteMap.get(rec.target_site) || rec.target_site_name || `Site #${rec.target_site}`}
+                            </span>
+                          </div>
+
+                          <p className="text-[11px] text-stone-600 mt-1 line-clamp-2 leading-snug">{rec.reason}</p>
+
+                          <div className="mt-2.5 flex items-center justify-between pt-1.5 border-t border-stone-200/60">
+                            <span
+                              className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+                                rec.status === 'ACCEPTED'
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : rec.status === 'DISMISSED'
+                                    ? 'bg-stone-200 text-stone-700'
+                                    : 'bg-indigo-100 text-indigo-900'
+                              }`}
+                            >
+                              {rec.status}
+                            </span>
+
+                            {rec.status === 'PENDING' && (
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleDismissRecommendation(rec.id)}
+                                  className="text-[10px] font-bold text-stone-500 hover:text-stone-800 cursor-pointer"
+                                >
+                                  Dismiss
+                                </button>
+                                <button
+                                  onClick={() => handleAcceptRecommendation(rec.id)}
+                                  className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 text-white px-2 py-0.5 text-[10px] font-bold hover:bg-emerald-700 transition cursor-pointer"
+                                >
+                                  <Check size={11} /> Accept
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-[11px]">
+                  <span className="font-bold text-stone-500">Total Recommendations: {recommendations.length}</span>
+                  <span className="font-extrabold text-indigo-700">{pendingRecommendations.length} Pending Actions</span>
+                </div>
+              </div>
+
             </div>
           </div>
 
