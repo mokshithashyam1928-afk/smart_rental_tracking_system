@@ -52,22 +52,7 @@ export function LoginPage() {
               Monitor Caterpillar rental machinery, dispatch certified operators, track telematics, and optimize heavy asset utilization across every job site.
             </p>
 
-            <div className="mt-8 space-y-3">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.25em] text-stone-300">Active Heavy Fleet</p>
-                  <p className="mt-1 text-2xl font-bold text-[#f5c16c]">11 Cat Machines</p>
-                </div>
-                <span className="text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-full font-semibold">Live GPS</span>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.25em] text-stone-300">Deployment Sites</p>
-                  <p className="mt-1 text-2xl font-bold text-[#7dd3c0]">5 Active Sites</p>
-                </div>
-                <span className="text-xs bg-blue-500/20 text-blue-300 px-2.5 py-1 rounded-full font-semibold">Geo-fenced</span>
-              </div>
-            </div>
+
           </div>
 
           <div className="mt-8 text-xs text-stone-400">
