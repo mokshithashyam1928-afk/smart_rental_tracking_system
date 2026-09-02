@@ -7,6 +7,7 @@ export type Asset = {
   name: string
   type: string
   site: string
+  siteCode?: string
   status: EquipmentStatus
   operator: string
   fuel: number
@@ -25,6 +26,7 @@ export type Rental = {
   equipmentName: string
   operator: string
   site: string
+  siteCode?: string
   startDate: string
   endDate: string
   status: 'ACTIVE' | 'OVERDUE' | 'COMPLETED'

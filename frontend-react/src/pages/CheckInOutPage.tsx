@@ -32,6 +32,7 @@ interface TransactionRecord {
   equipmentName: string
   operatorName: string
   siteName: string
+  siteCode?: string
   timestamp: string
 }
 
@@ -90,6 +91,7 @@ export function CheckInOutPage() {
           equipmentName: r.equipmentName,
           operatorName: r.operator || 'Assigned Operator',
           siteName: r.site || 'Site',
+          siteCode: r.siteCode,
           timestamp: r.startDate || new Date().toLocaleDateString(),
         }))
         setRecentTransactions(txList)
@@ -229,6 +231,7 @@ export function CheckInOutPage() {
 
       const opName = (opDetail.name as string) || 'Assigned Operator'
       const siteName = (siteDetail.name as string) || (eq.site_detail?.name as string) || 'Site'
+      const siteCode = (siteDetail.site_code as string) || (eq.site_detail?.site_code as string) || undefined
 
       const newRecord: TransactionRecord = {
         id: `TX-${Date.now().toString().slice(-6)}`,
@@ -237,6 +240,7 @@ export function CheckInOutPage() {
         equipmentName: eq.model || eq.equipment_type,
         operatorName: opName,
         siteName: siteName,
+        siteCode: siteCode,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }
 
@@ -244,7 +248,7 @@ export function CheckInOutPage() {
       setLastActionType(result.action)
 
       if (result.action === 'CHECK_OUT') {
-        setActionSuccess(`Checked Out: ${eq.equipment_id} dispatched to ${siteName}!`)
+        setActionSuccess('Checked Out: ' + eq.equipment_id + ' dispatched to ' + siteName + (siteCode ? ' (' + siteCode + ')' : '') + '!')
       } else {
         setActionSuccess(`Checked In: ${eq.equipment_id} returned to yard and marked AVAILABLE!`)
       }
@@ -361,7 +365,7 @@ export function CheckInOutPage() {
                   >
                     {sites.map((site) => (
                       <option key={site.id} value={site.id}>
-                        {site.name} ({site.site_code})
+                        {site.name} ({site.site_code || `SITE-${site.id}`})
                       </option>
                     ))}
                   </select>
@@ -594,6 +598,14 @@ export function CheckInOutPage() {
                         ? '🟢 In Depot Yard (Available)'
                         : '🟡 Deployed On Job Site'}
                     </p>
+                    {resolvedEquipment.site_detail && (
+                      <p className="font-semibold text-stone-700">
+                        Site: {resolvedEquipment.site_detail.name}{' '}
+                        <span className="font-mono text-stone-500">
+                          ({resolvedEquipment.site_detail.site_code || `SITE-${resolvedEquipment.site_detail.id}`})
+                        </span>
+                      </p>
+                    )}
                     <p className="text-stone-500">
                       {resolvedEquipment.status === 'AVAILABLE'
                         ? 'Next QR scan will automatically dispatch this vehicle to the designated job site.'
@@ -679,7 +691,12 @@ export function CheckInOutPage() {
                           <p className="text-[11px] text-stone-500">{tx.equipmentName}</p>
                         </td>
                         <td className="py-3 pr-4">{tx.operatorName}</td>
-                        <td className="py-3 pr-4">{tx.siteName}</td>
+                        <td className="py-3 pr-4">
+                          <p className="font-bold text-stone-900">{tx.siteName}</p>
+                          <p className="font-mono text-[11px] text-stone-500">
+                            {tx.siteCode || 'Site ID unavailable'}
+                          </p>
+                        </td>
                         <td className="py-3 pr-4 text-stone-500 font-mono">{tx.timestamp}</td>
                       </tr>
                     ))}

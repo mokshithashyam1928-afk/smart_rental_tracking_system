@@ -8,6 +8,7 @@ import { EquipmentPage } from './pages/EquipmentPage'
 import { InventoryPage } from './pages/InventoryPage'
 import { LoginPage } from './pages/LoginPage'
 import { RentalsPage } from './pages/RentalsPage'
+import { SitesPage } from './pages/SitesPage'
 import { SignupPage } from './pages/SignupPage'
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -32,8 +33,7 @@ export default function App() {
       <Route path="/checkin-checkout" element={<ProtectedRoute><CheckInOutPage /></ProtectedRoute>} />
       <Route path="/equipment" element={<ProtectedRoute><EquipmentPage /></ProtectedRoute>} />
       <Route path="/inventory" element={<ProtectedRoute><InventoryPage /></ProtectedRoute>} />
-      <Route path="/sites" element={<ProtectedRoute><InventoryPage /></ProtectedRoute>} />
-      <Route path="/operators" element={<ProtectedRoute><InventoryPage /></ProtectedRoute>} />
+      <Route path="/sites" element={<ProtectedRoute><SitesPage /></ProtectedRoute>} />
       <Route path="/rentals" element={<ProtectedRoute><RentalsPage /></ProtectedRoute>} />
       <Route path="/analytics" element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
 

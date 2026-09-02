@@ -8,7 +8,6 @@ const navItems = [
   { to: '/equipment', label: 'Equipment', icon: Truck, roles: ['ADMIN', 'MANAGER', 'OPERATOR', 'VIEWER'] },
   { to: '/inventory', label: 'Inventory', icon: Truck, roles: ['ADMIN', 'MANAGER', 'OPERATOR', 'VIEWER'] },
   { to: '/sites', label: 'Sites', icon: MapPinned, roles: ['ADMIN', 'MANAGER', 'OPERATOR', 'VIEWER'] },
-  { to: '/operators', label: 'Operators', icon: UserCircle2, roles: ['ADMIN', 'MANAGER', 'OPERATOR'] },
   { to: '/rentals', label: 'Rentals', icon: Activity, roles: ['ADMIN', 'MANAGER', 'OPERATOR'] },
   { to: '/analytics', label: 'Analytics', icon: ShieldCheck, roles: ['ADMIN', 'MANAGER'] },
 ]

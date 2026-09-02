@@ -90,11 +90,13 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 // ---------------------------------------------------------------------------
 function adaptEquipment(eq: Record<string, unknown>): Asset {
   const liveState = (eq.live_state as Record<string, unknown>) || {}
+  const site = (eq.site_detail as Record<string, unknown>) || (eq.site as Record<string, unknown>) || {}
   return {
     id: eq.equipment_id as string,
     name: (eq.model as string) || (eq.equipment_type as string),
     type: eq.equipment_type as string,
-    site: ((eq.site as Record<string, unknown>)?.name as string) || 'Unassigned',
+    site: (site.name as string) || 'Unassigned',
+    siteCode: (site.site_code as string) || undefined,
     status: (eq.status as Asset['status']) || 'OFFLINE',
     operator: ((eq.current_operator as Record<string, unknown>)?.name as string) || 'Unassigned',
     fuel: (liveState.fuel_level as number) ?? 0,
@@ -120,6 +122,7 @@ function adaptRental(r: Record<string, unknown>): Rental {
     equipmentName: (eq.model as string) || (eq.equipment_type as string) || (eq.equipment_id as string) || 'Equipment',
     operator: (operator.name as string) || '',
     site: (site.name as string) || '',
+    siteCode: (site.site_code as string) || undefined,
     startDate: r.checkout_at ? (r.checkout_at as string).split('T')[0] : '',
     endDate: r.due_at ? (r.due_at as string).split('T')[0] : '',
     status:
